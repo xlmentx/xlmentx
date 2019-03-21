@@ -36,11 +36,10 @@ public class Track
 	// Creates New Track
 	static void newTrack(int trackLength)
 	{	// Background
+		background = new Group();
 		Polygon sky = newPolygon(new double[2], Resolution, 0);
 		sky.setFill(Color.DEEPSKYBLUE);
-		background = new Group();
 		background.getChildren().add(sky);
-		
 		Polygon mountain = new Polygon();
 		double[] position = {0, Resolution[1]*0.7},
 				 // Rates 		{Sm,	Md,		Lg		Max}
@@ -57,7 +56,6 @@ public class Track
 			}
 			merge(mountain, newPolygon(position, dimension, topSlope));
 		}
-		
 		mountain.setFill(Color.LIGHTSTEELBLUE);
 		background.getChildren().add(mountain);
 		background.setCache(true);

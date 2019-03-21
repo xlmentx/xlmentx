@@ -5,10 +5,13 @@
 		<item value="false" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
 		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
+			<item value="C:\Users\acortes\xLMeNTx"/>
+			<item value="C:\Users\acortes\xLMeNTx\games"/>
 			<item value="C:\Users\acortes\eclipse-workspace\xLMeNTx"/>
 		</list>
 		<list key="WizardProjectsImportPage.STORE_ARCHIVES">
 			<item value=""/>
+			<item value="C:\Users\acortes\xLMeNTx\xLMeNTx"/>
 		</list>
 	</section>
 	<section name="ChooseWorkspaceDialogSettings">
