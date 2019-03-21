@@ -19,7 +19,7 @@ public class Racer extends Physics
 						Jump = 	{new Image("image/character/jump.png")}, 	
 						WJump = {new Image("image/character/wallJump.png")},
 						Fall = 	{new Image("image/character/fall.png")};
-	private Image		rImage;
+	private ImageView	rImage;
 	
 	// Racer Variables		
 	private static			//	{gAcl,	aAcl,	tSpd,	gJmp,	aJmp}
@@ -69,7 +69,10 @@ public class Racer extends Physics
 		}
 		
 		// Character Image
-		rImage = Fall[type];
+		rImage = new ImageView(Fall[type]);
+		rImage.setX(position[0]-dimension[0]/2);	
+		rImage.setY(position[1]-dimension[1]/2);
+		
 	}	
 	
 	public void save()
@@ -104,6 +107,8 @@ public class Racer extends Physics
 		}
 	
 		physicsUpdate();
+		rImage.setX(position[0]-dimension[0]/2);	
+		rImage.setY(position[1]-dimension[1]/2);
 	}
 	
 	// Move
@@ -117,13 +122,13 @@ public class Racer extends Physics
 				{	velocity[0] += gAccel*input*cVector[0]; 	 
 					velocity[1] += gAccel*input*cVector[1];
 				}	
-				rImage = Run[type];	
+				rImage.setImage(Run[type]);	
 			}
 			// Slide
 			else
 			{	velocity[0] += gAccel*input*cVector[0]*2; 	 
 				velocity[1] += gAccel*input*cVector[1]*2;
-				rImage = Slide[type];	
+				rImage.setImage(Slide[type]);	
 			}
 		}
 		// Air
@@ -142,9 +147,14 @@ public class Racer extends Physics
 	}
 	
 	// Graphics Update
-	public void translate(double[] cPosition, GraphicsContext gc)
-	{	double 	xTranslation = position[0]+cPosition[0],
-				yTranslation = position[1]+cPosition[1];
-		gc.drawImage(rImage, xTranslation-dimension[0]/2, yTranslation-dimension[1]/2);
+	public void translate(double[] cPosition)
+	{	rImage.setTranslateX(cPosition[0]);	
+		rImage.setTranslateY(cPosition[1]);
 	}
+	
+	// Getters
+	public ImageView getRacer()
+	{	return rImage;
+	}
+	
 }

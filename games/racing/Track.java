@@ -1,98 +1,117 @@
 package racing;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import javafx.scene.canvas.GraphicsContext;
+import javafx.collections.ObservableList;
+import javafx.scene.CacheHint;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Shape;
 
 public class Track
 {	// Track Variables
 	private static 			
 	final double[]			Resolution ={Game.getResolution()[0], Game.getResolution()[1]},
-							// Ranges		{Min,				Max}
-							xShiftRange =	{Resolution[0]*0.1,	Resolution[0]*0.8},
-							yShiftRange =	{Resolution[1]*0.1,	Resolution[1]*0.8},
-							widthRange =	{Resolution[0]*0.1,	Resolution[0]},
-							slopeRange =	{0,					0.8},
-							// Rates 		{Sm,	Md,		Lg}
-							pGapRates =		{0,    	0,    	0},
-							pWallRates =	{0,   	0,  	0},
-							pDropRates =	{0.0,   0,  	0},
-							pWidthRates =	{0.3,   0.3,   	0.3},
-							pInclineRates =	{0.0,   0.0,   	0.1},
-							pDeclineRates =	{0.0,   0.0,   	0.1}; 
+							
+							// Ranges	{Min,				Max}
+							xRange =	{Resolution[0]*0.1,	Resolution[0]*0.8},
+							yRange =	{Resolution[1]*0.1,	Resolution[1]*0.8},
+							sRange =	{0,					0.8},
+							
+							// Rates 		{Sm,	Md,		Lg		Max}
+							pGapRates =		{0,    	0,    	0,		0	},
+							pWallRates =	{0,   	0,  	0,		0	},
+							pDropRates =	{0.0,   0,  	0,		0	},
+							pWidthRates =	{0.3,   0.3,   	0.3,	0	},
+							pInclineRates =	{0.0,   0.0,   	0.1,	0	},
+							pDeclineRates =	{0.0,   0.0,   	0.1,	0}; 
 					
-	private static ArrayList<Polygon> background, platforms;
+	private static Group 	background, 	platforms;
 	
 	// Private Constructor
-	private Track()
-	{}
+	private Track(){}
 	
 	// Creates New Track
 	static void newTrack(int trackLength)
 	{	// Background
-		background = new ArrayList<>();
-		Color skyColor = Color.DEEPSKYBLUE;
-		background.add(newPolygon(Resolution, skyColor));
-		Color mountainColor = Color.LIGHTSTEELBLUE;
-		double[] 			  //{Sm,	Md,		Lg,		xLg}
-				 mWidthRates = 	{1, 	0, 		0,		0},
-				 mInclineRates ={1, 	0.0, 	0,		0.7},
-				 mDeclineRates ={1, 	0.0,	0,		0.7},
-				 position = 	{0, Resolution[1]*0.7};
-		while(position[0] < trackLength)
-		{	double[] dimension = {random(widthRange, mWidthRates)/3, Resolution[1]-position[1]};
-			double 	 topSlope = -random(slopeRange, mInclineRates);
+		Polygon sky = newPolygon(new double[2], Resolution, 0);
+		sky.setFill(Color.DEEPSKYBLUE);
+		background = new Group();
+		background.getChildren().add(sky);
+		
+		Polygon mountain = new Polygon();
+		double[] position = {0, Resolution[1]*0.7},
+				 // Rates 		{Sm,	Md,		Lg		Max}
+				 mWidthRates = 	{1, 	0,		0,		0},
+				 mInclineRates ={1, 	0, 		0, 		0.7};
+		while(position[0] < Resolution[0])
+		{	double[] dimension = {random(xRange, mWidthRates)/5, Resolution[1]-position[1]};
+			double 	 topSlope = -random(sRange, mInclineRates)*1.3;
 			if(position[0] >= Resolution[0]*0.45)
-			{	topSlope = random(slopeRange, mDeclineRates);
+			{	topSlope = -random(sRange, mInclineRates)/2;
 			}
-			background.add(newPolygon(position, dimension, topSlope, mountainColor));
+			if(position[0] >= Resolution[0]*0.5)
+			{	topSlope = random(sRange, mInclineRates)*1.3;
+			}
+			merge(mountain, newPolygon(position, dimension, topSlope));
 		}
 		
+		mountain.setFill(Color.LIGHTSTEELBLUE);
+		background.getChildren().add(mountain);
+		background.setCache(true);
+		background.setCacheHint(CacheHint.QUALITY);
+		
 		// Platforms
-		platforms = new ArrayList<>();
-		Color pColor = Color.ALICEBLUE;
+		platforms = new Group();
 		position = new double[]{-Resolution[0], Resolution[1]*0.8};
 		while(position[0] < Resolution[0])
-		{	double[] dimension = {random(widthRange, pWidthRates), Resolution[0]};
-			platforms.add(newPolygon(position, dimension, pColor));
+		{	double[] dimension = {random(xRange, pWidthRates), Resolution[0]};
+			Polygon runway = newPolygon(position, dimension, 0);
+			runway.setFill(Color.ALICEBLUE);
+			platforms.getChildren().add(runway);
 		}
 		while(position[0] < trackLength)
-		{	double[] shift = {random(xShiftRange, pGapRates, 0), -random(yShiftRange, pWallRates, 0)};
-					 shift[1] = random(yShiftRange, pDropRates, shift[1]);
-			double[] dimension = {random(widthRange, pWidthRates), Resolution[0]};
-			double 	 topSlope = random(slopeRange, pDeclineRates, -random(slopeRange, pInclineRates));
-			platforms.add(newPolygon(position, shift, dimension, topSlope, pColor));
+		{	position[0] += random(xRange, pGapRates, 0);
+			position[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
+			double[] dimension = {random(xRange, pWidthRates), Resolution[0]};
+			double 	 topSlope = random(sRange, pDeclineRates, -random(sRange, pInclineRates));
+			Polygon platform = newPolygon(position, dimension, topSlope);
+			platform.setFill(Color.ALICEBLUE);
+			platforms.getChildren().add(platform);
 		}
-	
+		platforms.setCache(true);
+		platforms.setCacheHint(CacheHint.SPEED);
 	}
 	
 	// Create Polygon
-	private static Polygon newPolygon(double[] dimension, Color color)
-	{	return newPolygon(new double[2], dimension, color);
-	}
-	private static Polygon newPolygon(double[] position, double[] dimension, Color color)
-	{	return newPolygon(position, dimension, 0, color);
-	}
-	private static Polygon newPolygon(double[] position, double[] dimension, double topSlope, Color color)
-	{	return newPolygon(position, new double[2], dimension, topSlope, color);
-	}	
-	private static Polygon newPolygon(double[] position, double[] shift, double[] dimension, double topSlope, Color color)
-	{	// Shift
-		position[0] += shift[0];
-		position[1] += shift[1];
+	private static Polygon newPolygon(double[] position, double[] dimension, double topSlope)
+	{	Polygon p = new Polygon
+		(	(int)position[0], 			position[1],
+			position[0]+dimension[0], 	position[1]+dimension[0]*topSlope,
+			position[0]+dimension[0], 	position[1]+dimension[1],
+			(int)position[0], 			position[1]+dimension[1]
+		);
 	
-		// Polygon
-		double[] xPoints = {(int)position[0], position[0]+dimension[0], position[0]+dimension[0], (int)position[0]};
-		double[] yPoints = {position[1], position[1]+dimension[0]*topSlope, position[1]+dimension[1], position[1]+dimension[1]};
-		Polygon p = new Polygon(xPoints, yPoints, color);
-
 		// Next Position
 		position[0] += dimension[0];
 		position[1] += dimension[0]*topSlope;
-		
 		return p;
+	}
+	
+	// Merge Polygons
+	private static Polygon merge(Polygon A, Polygon B)
+	{	List<Double> aPoints = A.getPoints(),
+			 		 bPoints = B.getPoints();
+		
+		// Overlap Check
+		if(aPoints.size() > 0 && aPoints.get(aPoints.size()/2-1).equals(bPoints.get(1)))
+		{	bPoints = bPoints.subList(2, bPoints.size()-2);
+		}
+		
+		aPoints.addAll(aPoints.size()/2, bPoints);
+		return A;
 	}
 	
 	// Random Values
@@ -113,20 +132,17 @@ public class Track
 	}	
 	
 	// Track Update
-	static void translate(double[] cPosition, GraphicsContext gc) 
-	{	// BackGround
-		for(int i = 0; i < background.size(); i++)
-		{	background.get(i).draw(new double[2], gc);
-		}
-		
-		// Platforms
-		for(int i = 0; i < platforms.size(); i++)
-		{	platforms.get(i).draw(cPosition, gc);
-		}
+	static void translate(double[] cPosition) 
+	{	// Platforms
+		platforms.setTranslateY(cPosition[1]);
+		platforms.setTranslateX(cPosition[0]);
 	}
 	
 	// Getters
-	static public ArrayList<Polygon> getPlatforms()
+	static Group getBackground()
+	{	return background;
+	}
+	static Group getPlatforms()
 	{	return platforms;
 	}
 }

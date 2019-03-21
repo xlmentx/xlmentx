@@ -1,6 +1,7 @@
 package racing;
 
-import java.util.ArrayList;
+import javafx.scene.Group;
+import javafx.scene.shape.Polygon;
 
 abstract class Physics 
 {	// Physics Variables
@@ -16,16 +17,17 @@ abstract class Physics
 
 		// Platform Scans
 		cVector = new double[]{0, 0};
-		ArrayList<Polygon> Platforms = Track.getPlatforms();
-		for(int i = 0; i < Platforms.size(); i++)
-		{	// Surface Scans
-			double[] xPoints = Platforms.get(i).getXPoints(),
-					 yPoints = Platforms.get(i).getYPoints();
-			for(int j = 0; j < xPoints.length; j++)
-			{	double startX = xPoints[j];
-				double startY = yPoints[j];
-				double endX = xPoints[(j+1)%xPoints.length];
-				double endY = yPoints[(j+1)%yPoints.length];
+		Group Platforms = (Group)Track.getPlatforms();
+		for(int i = 0; i < Platforms.getChildren().size(); i++)
+		{	Polygon platform = (Polygon)Platforms.getChildren().get(i);
+			
+			// Surface Scans
+			int pointSize = platform.getPoints().size();
+			for(int j = 0; j < pointSize; j += 2)
+			{	double startX = platform.getPoints().get(j);
+				double startY = platform.getPoints().get(j+1);
+				double endX = platform.getPoints().get((j+2)%pointSize);
+				double endY = platform.getPoints().get((j+3)%pointSize);
 				scanSurface(startX, startY, endX, endY);
 			}
 		}

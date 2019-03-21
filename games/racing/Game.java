@@ -53,19 +53,14 @@ public class Game extends Application
 				 sRange = {Resolution[1]*0.4,Resolution[1]*0.8};
 		Camera   camera = new Camera(subject, sDomain, sRange);
 		
-		// Game Canvas 17-18 FPS
-		Canvas 	GameCanvas = new Canvas(Resolution[0], Resolution[1]);
-		GraphicsContext gc = GameCanvas.getGraphicsContext2D();
-		root.getChildren().add(GameCanvas);
-		
-		// Game Pane 45-50 FPS
-		//Pane GamePane = new Pane();
-		//GamePane.getChildren().add(Track.getBackground());
+		// Game Pane 62 FPS
+		Pane GamePane = new Pane();
+		GamePane.getChildren().add(Track.getBackground());
 		//GamePane.getChildren().add(Track.getMidground());
 		//GamePane.getChildren().add(Track.getForeground());
-		//GamePane.getChildren().add(Track.getPlatforms());
-		//GamePane.getChildren().add(player.get(0).getRacer());
-		//root.getChildren().add(GamePane);
+		GamePane.getChildren().add(Track.getPlatforms());
+		GamePane.getChildren().add(player.get(0).getRacer());
+		root.getChildren().add(GamePane);
 		
 		// Key Inputs
 		ArrayList<String> keyInputs = new ArrayList<>();
@@ -94,9 +89,9 @@ public class Game extends Application
 				
 				// Camera Update
 				camera.update();
-				Track.translate(camera.getPosition(), gc);
+				Track.translate(camera.getPosition());
 				for(int i = 0; i < player.size(); i++)
-				{	player.get(i).translate(camera.getPosition(), gc);
+				{	player.get(i).translate(camera.getPosition());
 				}
 				
 				// Frames/Second
