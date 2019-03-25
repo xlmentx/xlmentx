@@ -29,7 +29,7 @@ public class Track
 							pDeclineRates =	{1.0,   0.0,   	0.0}; 
 					
 	private static Group 	background,  midground,  platforms;
-	private static int 		midgroundSpeed = 30;
+	private static int 		midgroundSpeed = 20;
 	
 	// Private Constructor
 	private Track(){}
@@ -45,22 +45,9 @@ public class Track
 		sky.setFill(Color.DEEPSKYBLUE);
 		background.getChildren().add(sky);
 		
-		Polygon mountain = new Polygon();
-		double[] position = {0, Resolution[1]*0.7},
-				 // Rates 		{Sm,	Md,		Lg		Max}
-				 mWidthRates = 	{1, 	0,		0,		0},
-				 mInclineRates ={1, 	0, 		0, 		0.7};
-		while(position[0] < Resolution[0])
-		{	double[] dimension = {random(xRange, mWidthRates, xRange[0])/5, Resolution[1]-position[1]};
-			double 	 topSlope = -random(sRange, mInclineRates, sRange[0])*1.3;
-			if(position[0] >= Resolution[0]*0.45)
-			{	topSlope = -random(sRange, mInclineRates, sRange[0])/2;
-			}
-			if(position[0] >= Resolution[0]*0.5)
-			{	topSlope = random(sRange, mInclineRates, sRange[0])*1.3;
-			}
-			merge(mountain, newPolygon(position, dimension, topSlope));
-		}
+		double [] position = {0, Resolution[1]},
+				  dimension = {Resolution[0], Resolution[1]};
+		Polygon mountain = newMountain(position, dimension);
 		mountain.setFill(Color.LIGHTSTEELBLUE);
 		background.getChildren().add(mountain);
 		
@@ -69,22 +56,6 @@ public class Track
 		background.setCache(true);
 		background.setCacheHint(CacheHint.SPEED);
 		
-		Polygon hills = new Polygon();
-		position = new double[] {-Resolution[0]/midgroundSpeed, Resolution[1]*0.5};
-		double[] // Rates 		{Sm,	Md,		Lg}
-				 hWidthRates = 	{1, 	0,		0},
-				 hInclineRates ={1, 	0, 		0};
-		while(position[0] < trackLength/midgroundSpeed)
-		{	double[] dimension = {random(xRange, hWidthRates, 0)/5, Resolution[1]-position[1]};
-			double 	 topSlope = random(sRange, hInclineRates, sRange[0]);
-			if((position[0]/Resolution[0])%2 >= 1)
-			{	topSlope = -random(sRange, hInclineRates, sRange[0]);
-			}
-			merge(hills, newPolygon(position, dimension, topSlope));
-		}
-		hills.setFill(Color.LIGHTBLUE);
-		midground.getChildren().add(hills);
-		
 		// Platforms
 		platforms = new Group();
 		platforms.setCache(true);
@@ -92,7 +63,7 @@ public class Track
 		
 		position = new double[]{-Resolution[0], Resolution[1]*0.8};
 		while(position[0] < Resolution[0])
-		{	double[] dimension = {random(xRange, pWidthRates, xRange[0]), Resolution[0]};
+		{	dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
 			Polygon runway = newPolygon(position, dimension, 0);
 			runway.setFill(Color.ALICEBLUE);
 			platforms.getChildren().add(runway);
@@ -101,7 +72,7 @@ public class Track
 		while(position[0] < trackLength)
 		{	position[0] += random(xRange, pGapRates, 0);
 			position[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
-			double[] dimension = {random(xRange, pWidthRates, xRange[0]), Resolution[0]};
+			dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
 			double 	 topSlope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
 			Polygon platform = newPolygon(position, dimension, topSlope);
 			platform.setFill(Color.ALICEBLUE);
@@ -109,18 +80,46 @@ public class Track
 		}
 	}
 	
+	// Create Mountain
+	private static Polygon newMountain(double[] position,  double[] mDimension)
+	{	double[] 	// Ranges		{Min,	Max}
+				 	mWidthRange =	{0,		mDimension[0]/5},
+				 	mSlopeRange =	{0,		mDimension[1]/(mDimension[0]*0.4)},
+				 	
+				 	// Rates 		{Sm,	Md,		Lg} 
+				 	mWidthRates = 	{1, 	0,		0},
+				 	mSlopeRates =	{1, 	0, 		0.7};
+		
+		Polygon mountain = new Polygon();
+		double start = position[0];
+		while(position[0] < start+mDimension[0])
+		{	double[] dimension = {random(mWidthRange, mWidthRates, mWidthRange[0]), Resolution[1]-position[1]};
+			double 	 slope = -random(mSlopeRange, mSlopeRates, mSlopeRange[0]);
+			if(position[0] >= start+mDimension[0]*0.45 && position[0] < start+mDimension[0]*0.5)
+			{	slope = -random(mSlopeRange, mSlopeRates, mSlopeRange[0])/2;
+System.out.println("Cap:");			
+			}
+			if(position[0] >= start+mDimension[0]*0.5)
+			{	slope = random(mSlopeRange, mSlopeRates, mSlopeRange[0]);
+			}
+System.out.println("width:"+dimension[0]+" slope:"+slope);			
+			merge(mountain, newPolygon(position, dimension, slope));
+		}
+		return mountain;
+	}
+	
 	// Create Polygon
-	private static Polygon newPolygon(double[] position, double[] dimension, double topSlope)
+	private static Polygon newPolygon(double[] position, double[] dimension, double slope)
 	{	Polygon p = new Polygon
 		(	(int)position[0], 			position[1],
-			position[0]+dimension[0], 	position[1]+dimension[0]*topSlope,
+			position[0]+dimension[0], 	position[1]+dimension[0]*slope,
 			position[0]+dimension[0], 	position[1]+dimension[1],
 			(int)position[0], 			position[1]+dimension[1]
 		);
 	
 		// Next Position
 		position[0] += dimension[0];
-		position[1] += dimension[0]*topSlope;
+		position[1] += dimension[0]*slope;
 		return p;
 	}
 	
@@ -155,7 +154,7 @@ public class Track
 	// Track Update
 	static void translate(double[] cPosition) 
 	{	// Platforms
-		midground.setTranslateX(cPosition[0]/midgroundSpeed);
+		background.setTranslateX(cPosition[0]/midgroundSpeed);
 		
 		// Platforms
 		platforms.setTranslateY(cPosition[1]);
