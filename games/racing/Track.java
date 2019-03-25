@@ -83,20 +83,25 @@ public class Track
 	// Create Mountain
 	private static Polygon newMountain(double[] position,  double[] mDimension)
 	{	double[] 	// Ranges		{Min,	Max}
-				 	mWidthRange =	{mDimension[0]*0.02,	mDimension[0]*0.2},
-				 	mSlopeRange =	{0,		mDimension[1]/(mDimension[0]*0.4)},
+				 	mWidthRange =	{0, mDimension[0]*0.3},
+				 	mSlopeRange =	{0,	mDimension[1]/(mDimension[0]*0.4)},
 				 	
 				 	// Rates 		{Sm,	Md,		Lg} 
 				 	mWidthRates = 	{1, 	0,		0},
-				 	mSlopeRates =	{1, 	0, 		0.7};
+				 	mSlopeRates =	{1, 	0,		0.8};
 		
 		Polygon mountain = new Polygon();
 		double start = position[0];
 		while(position[0] < start+mDimension[0])
 		{	double[] dimension = {random(mWidthRange, mWidthRates, mWidthRange[0]), Resolution[1]-position[1]};
-			double 	direction = Math.cbrt(Math.cbrt((position[0]-start-mDimension[0]/2)*2/mDimension[0])), 
-					slope = random(mSlopeRange, mSlopeRates, mSlopeRange[0])*direction;
-System.out.println("width:"+dimension[0]+"	slope:"+slope+" direction:"+direction);			
+			double 	 direction = Math.signum(position[0]-start-mDimension[0]*0.5), 
+					 slope = random(mSlopeRange, mSlopeRates, mSlopeRange[0])*direction;
+System.out.println("width:"+((int)(dimension[0]*10))/10.0+"	slope:"+((int)(slope*10))/10.0+"	x:"+(int)position[0]+" y:"+(int)position[1]);			
+			if(position[0] >= start+mDimension[0]*0.45 && position[0] <= start+mDimension[0]*0.5)
+			{	slope /= 3;
+System.out.println("caped to:"+((int)(slope*10))/10.0);			
+			}	
+			
 			merge(mountain, newPolygon(position, dimension, slope));
 		}
 		return mountain;
