@@ -83,7 +83,7 @@ public class Track
 	// Create Mountain
 	private static Polygon newMountain(double[] position,  double[] mDimension)
 	{	double[] 	// Ranges		{Min,	Max}
-				 	mWidthRange =	{0,		mDimension[0]/5},
+				 	mWidthRange =	{mDimension[0]*0.02,	mDimension[0]*0.2},
 				 	mSlopeRange =	{0,		mDimension[1]/(mDimension[0]*0.4)},
 				 	
 				 	// Rates 		{Sm,	Md,		Lg} 
@@ -94,15 +94,9 @@ public class Track
 		double start = position[0];
 		while(position[0] < start+mDimension[0])
 		{	double[] dimension = {random(mWidthRange, mWidthRates, mWidthRange[0]), Resolution[1]-position[1]};
-			double 	 slope = -random(mSlopeRange, mSlopeRates, mSlopeRange[0]);
-			if(position[0] >= start+mDimension[0]*0.45 && position[0] < start+mDimension[0]*0.5)
-			{	slope = -random(mSlopeRange, mSlopeRates, mSlopeRange[0])/2;
-System.out.println("Cap:");			
-			}
-			if(position[0] >= start+mDimension[0]*0.5)
-			{	slope = random(mSlopeRange, mSlopeRates, mSlopeRange[0]);
-			}
-System.out.println("width:"+dimension[0]+" slope:"+slope);			
+			double 	direction = Math.cbrt(Math.cbrt((position[0]-start-mDimension[0]/2)*2/mDimension[0])), 
+					slope = random(mSlopeRange, mSlopeRates, mSlopeRange[0])*direction;
+System.out.println("width:"+dimension[0]+"	slope:"+slope+" direction:"+direction);			
 			merge(mountain, newPolygon(position, dimension, slope));
 		}
 		return mountain;
