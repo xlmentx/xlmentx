@@ -104,7 +104,7 @@ public class Game extends Application
 				{	last = now;
 					i++;
 					averageFrames += frames;
-System.out.println(" Frame:"+frames+" Average:"+averageFrames/i);
+//System.out.println(" Frame:"+frames+" Average:"+averageFrames/i);
 					frames = 0;
 				}
 			}
