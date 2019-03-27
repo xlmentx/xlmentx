@@ -83,30 +83,27 @@ public class Track
 	// Create Mountain
 	private static Polygon newMountain(double[] position,  double[] mDimension)
 	{	double[] 	// Ranges		{Min,	Max}
-				 	mWidthRange =	{0, mDimension[0]*0.3},
+				 	mWidthRange =	{0, mDimension[0]*0.4},
 				 	mSlopeRange =	{0,	mDimension[1]/(mDimension[0]*0.4)},
 				 	
 				 	// Rates 		{Sm,	Md,		Lg,		Max} 
 				 	mWidthRates = 	{1, 	0,		0,		0},
-				 	mSlopeRates =	{1, 	0,		0,		0.7};
+				 	mSlopeRates =	{1, 	0,		0,		0.8};
 					
 		Polygon mountain = new Polygon();
 		double start = position[0];
 		while(position[0] < start+mDimension[0])
 		{	double[] pDimension = {random(mWidthRange, mWidthRates, mWidthRange[0]), Resolution[1]-position[1]};
-			double 	 pDirection = Math.signum(position[0]-start-mDimension[0]*0.5),
-					 pDirection2 = Math.cbrt((position[0]-(start+mDimension[0]/2))/mDimension[0]*2), 
-					 pDirection3 = Math.cbrt((position[0]+pDimension[0]/2-(start+mDimension[0]/2))/mDimension[0]*2), 
+			double 	 sDirection = Math.signum(position[0]+pDimension[0]/2-(start+mDimension[0]/2)),
 					 pSlope = random(mSlopeRange, mSlopeRates, mSlopeRange[0]);
-System.out.println("width:"+((int)(pDimension[0]*10))/10.0+"	slope:"+((int)(pSlope*10))/10.0
-					+"	direction:"+pDirection+" vs:"+((int)(pDirection2*10))/10.0+" vs:"+((int)(pDirection3*10))/10.0
-					+"	x:"+(int)position[0]+" y:"+(int)position[1]);			
-			if(position[0] >= start+mDimension[0]*0.4 && position[0]+pDimension[0] <= start+mDimension[0]*0.6)
-			{	//pSlope /= 2;
+System.out.println("width:"+(int)pDimension[0]+"	slope:"+((int)(pSlope*10))/10.0
+					+"	direction:"+((int)(sDirection*10))/10.0+"	x:"+(int)position[0]+" y:"+(int)position[1]);			
+			if(position[0] >= start+mDimension[0]*0.4 && position[0] <= start+mDimension[0]*0.5)
+			{	pSlope /= 3;
 System.out.println("		caped:"+((int)(pSlope*10))/10.0);			
 			}	
 			
-			merge(mountain, newPolygon(position, pDimension, pSlope*pDirection3));
+			merge(mountain, newPolygon(position, pDimension, pSlope*sDirection));
 		}
 		return mountain;
 	}
