@@ -45,17 +45,27 @@ public class Track
 		sky.setFill(Color.DEEPSKYBLUE);
 		background.getChildren().add(sky);
 		
-		double [] position = {0, Resolution[1]},
+		Polygon mountain = new Polygon();
+		double [] position = {0, Resolution[1]*0.8},
 				  dimension = {Resolution[0], Resolution[1]};
-		Polygon mountain = newMountain(position, dimension);
+		merge(mountain, newMountain(position, dimension));
 		mountain.setFill(Color.LIGHTSTEELBLUE);
 		background.getChildren().add(mountain);
 		
 		// Midground
 		midground = new Group();
-		background.setCache(true);
-		background.setCacheHint(CacheHint.SPEED);
-		
+		midground.setCache(true);
+		midground.setCacheHint(CacheHint.SPEED);
+				
+		Polygon hills = new Polygon();
+		position = new double[]{-Resolution[0], Resolution[1]*0.8};
+		dimension = new double[]{Resolution[0], Resolution[1]/2};
+		while(position[0] < trackLength)
+		{	merge(hills, newMountain(position, dimension));
+		}
+		hills.setFill(Color.LIGHTBLUE);
+		midground.getChildren().add(hills);
+	
 		// Platforms
 		platforms = new Group();
 		platforms.setCache(true);
@@ -63,7 +73,7 @@ public class Track
 		
 		position = new double[]{-Resolution[0], Resolution[1]*0.8};
 		while(position[0] < Resolution[0])
-		{	dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
+		{	dimension = new double[]{random(xRange, pWidthRates), Resolution[0]};
 			Polygon runway = newPolygon(position, dimension, 0);
 			runway.setFill(Color.ALICEBLUE);
 			platforms.getChildren().add(runway);
@@ -82,28 +92,22 @@ public class Track
 	
 	// Create Mountain
 	private static Polygon newMountain(double[] position,  double[] mDimension)
-	{	double[] 	// Ranges		{Min,	Max}
-				 	mWidthRange =	{0, mDimension[0]*0.4},
-				 	mSlopeRange =	{0,	mDimension[1]/(mDimension[0]*0.4)},
-				 	
-				 	// Rates 		{Sm,	Md,		Lg,		Max} 
-				 	mWidthRates = 	{1, 	0,		0,		0},
-				 	mSlopeRates =	{1, 	0,		0,		0.8};
+	{	double[] 	widthRange =	{0, mDimension[0]*0.1},
+				 	slopeRange =	{0,	mDimension[1]/(mDimension[0]*0.4)},
+				 	slopeRates =	{1, 0,	0,	0.8};
 					
 		Polygon mountain = new Polygon();
-		double start = position[0];
-		while(position[0] < start+mDimension[0])
-		{	double[] pDimension = {random(mWidthRange, mWidthRates, mWidthRange[0]), Resolution[1]-position[1]};
-			double 	 sDirection = Math.signum(position[0]+pDimension[0]/2-(start+mDimension[0]/2)),
-					 pSlope = random(mSlopeRange, mSlopeRates, mSlopeRange[0]);
-System.out.println("width:"+(int)pDimension[0]+"	slope:"+((int)(pSlope*10))/10.0
-					+"	direction:"+((int)(sDirection*10))/10.0+"	x:"+(int)position[0]+" y:"+(int)position[1]);			
-			if(position[0] >= start+mDimension[0]*0.4 && position[0] <= start+mDimension[0]*0.5)
-			{	pSlope /= 3;
-System.out.println("		caped:"+((int)(pSlope*10))/10.0);			
+		double mStart = position[0];
+		while(position[0] < mStart+mDimension[0])
+		{	double[] dimension = {random(widthRange), Resolution[1]-position[1]};
+			double 	 slope = -random(slopeRange, slopeRates);
+			if(position[0]+dimension[0]/2 > mStart+mDimension[0]*0.5)
+			{	slope *= -1;
+			}
+			else if(position[0]+dimension[0]/2 >= mStart+mDimension[0]*0.4)
+			{	slope /= 3;
 			}	
-			
-			merge(mountain, newPolygon(position, pDimension, pSlope*sDirection));
+			merge(mountain, newPolygon(position, dimension, slope));
 		}
 		return mountain;
 	}
@@ -138,6 +142,12 @@ System.out.println("		caped:"+((int)(pSlope*10))/10.0);
 	}
 	
 	// Random Values
+	private static double random(double[] range)
+	{	return random(range, new double[]{1});
+	}
+	private static double random(double[] range, double[] rates)
+	{	return random(range, rates, range[0]);
+	}
 	private static double random(double[] range, double[] rates, double defaultValue)
 	{	double 	randomValue = defaultValue,
 				rangeSegments = (range[1]-range[0])/rates.length;
@@ -153,8 +163,8 @@ System.out.println("		caped:"+((int)(pSlope*10))/10.0);
 	
 	// Track Update
 	static void translate(double[] cPosition) 
-	{	// Platforms
-		background.setTranslateX(cPosition[0]/midgroundSpeed);
+	{	// Midground
+		midground.setTranslateX(cPosition[0]/midgroundSpeed);
 		
 		// Platforms
 		platforms.setTranslateY(cPosition[1]);
