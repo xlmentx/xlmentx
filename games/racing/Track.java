@@ -56,7 +56,8 @@ public class Track
 		midground = new Group();
 		midground.setCache(true);
 		midground.setCacheHint(CacheHint.SPEED);
-				
+		
+		//Test comment
 		Polygon hills = new Polygon();
 		position = new double[]{-Resolution[0], Resolution[1]*0.8};
 		dimension = new double[]{Resolution[0], Resolution[1]/2};
