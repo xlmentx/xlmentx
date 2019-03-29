@@ -45,10 +45,9 @@ public class Track
 		sky.setFill(Color.DEEPSKYBLUE);
 		background.getChildren().add(sky);
 		
-		Polygon mountain = new Polygon();
 		double [] position = {0, Resolution[1]*0.8},
 				  dimension = {Resolution[0], Resolution[1]};
-		merge(mountain, newMountain(position, dimension));
+		Polygon mountain = newMountain(position, dimension, 1);
 		mountain.setFill(Color.LIGHTSTEELBLUE);
 		background.getChildren().add(mountain);
 		
@@ -57,13 +56,9 @@ public class Track
 		midground.setCache(true);
 		midground.setCacheHint(CacheHint.SPEED);
 		
-		//Test comment
-		Polygon hills = new Polygon();
-		position = new double[]{-Resolution[0], Resolution[1]*0.8};
-		dimension = new double[]{Resolution[0], Resolution[1]/2};
-		while(position[0] < trackLength)
-		{	merge(hills, newMountain(position, dimension));
-		}
+		position = new double[]{0, Resolution[1]*0.8};
+		dimension = new double[]{Resolution[0], Resolution[1]*0.5};
+		Polygon hills = newMountain(position, dimension, 3);
 		hills.setFill(Color.LIGHTBLUE);
 		midground.getChildren().add(hills);
 	
@@ -92,24 +87,28 @@ public class Track
 	}
 	
 	// Create Mountain
-	private static Polygon newMountain(double[] position,  double[] mDimension)
+	private static Polygon newMountain(double[] position,  double[] mDimension, int peaks)
 	{	double[] 	widthRange =	{0, mDimension[0]*0.1},
 				 	slopeRange =	{0,	mDimension[1]/(mDimension[0]*0.4)},
 				 	slopeRates =	{1, 0,	0,	0.8};
 					
 		Polygon mountain = new Polygon();
-		double mStart = position[0];
-		while(position[0] < mStart+mDimension[0])
-		{	double[] dimension = {random(widthRange), Resolution[1]-position[1]};
-			double 	 slope = -random(slopeRange, slopeRates);
-			if(position[0]+dimension[0]/2 > mStart+mDimension[0]*0.5)
-			{	slope *= -1;
+		for(int i = 0; i < peaks; i++)
+		{	double[] start = position.clone();
+			while(position[0] < start[0]+mDimension[0])
+			{	double[] dimension = {random(widthRange), Resolution[1]-position[1]};
+				double 	 slope = -random(slopeRange, slopeRates);
+				if(position[0]+dimension[0]/2 > start[0]+mDimension[0]*0.5)
+				{	slope *= -1;
+				}
+				else if(position[0]+dimension[0]/2 >= start[0]+mDimension[0]*0.4)
+				{	slope /= 3;
+				}	
+				merge(mountain, newPolygon(position, dimension, slope));
 			}
-			else if(position[0]+dimension[0]/2 >= mStart+mDimension[0]*0.4)
-			{	slope /= 3;
-			}	
-			merge(mountain, newPolygon(position, dimension, slope));
-		}
+			position[0] += Math.abs(position[1]-start[1])*3;
+			position[1] = start[1];
+		}	
 		return mountain;
 	}
 	
