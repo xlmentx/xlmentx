@@ -50,7 +50,7 @@ public class Track
 		Polygon mountain = newMountain(position, dimension, 1);
 		mountain.setFill(Color.LIGHTSTEELBLUE);
 		background.getChildren().add(mountain);
-	
+		
 		// Midground
 		midground = new Group();
 		midground.setCache(true);
@@ -60,7 +60,7 @@ public class Track
 		dimension = new double[]{Resolution[0], Resolution[1]};
 		Polygon hills = newMountain(position, dimension, 2);
 		hills.setFill(Color.LIGHTBLUE);
-		//midground.getChildren().add(hills);
+		midground.getChildren().add(hills);
 	
 		// Platforms
 		platforms = new Group();
@@ -88,30 +88,31 @@ public class Track
 	
 	// Create Mountain
 	private static Polygon newMountain(double[] position,  double[] mDimension, double peaks)
-	{	double[] 	widthRange = {0, mDimension[0]*0.1/peaks},
-				 	slopeRange = {0, mDimension[1]/(mDimension[0]*0.4/peaks)},
-				 	slopeRates = {1, 0, 0, 0.8};
+	{	double[] 	wRange = {0, mDimension[0]*0.1/peaks},
+				 	sRange = {0, mDimension[1]/(mDimension[0]*0.4/peaks)},
+				 	sRates = {1, 0, 0, 0.8};
 
-		Polygon mountain = new Polygon();
+		Polygon mountain = new Polygon();	
 System.out.println("start Mountain:");				
 		for(int i = 1; i <= peaks; i++)
 		{	double[] start = position.clone();
 System.out.println("   Peak XStart:"+ position[0]+" YStart:"+ position[1]);				
-			while(position[0] <= start[0]+mDimension[0]*i/peaks && position[1] <= start[1])
-			{	double[] dimension = {random(widthRange), Resolution[1]-position[1]};
-				double 	 slope = -random(slopeRange, slopeRates);
-				if(position[0] > start[0]+mDimension[0]*i*0.5/peaks)
+			while(position[0]+wRange[1] <= start[0]+mDimension[0]/peaks && position[1] <= start[1])
+			{	double[] dimension = {random(wRange), Resolution[1]-position[1]};
+				double 	 slope = -random(sRange, sRates);
+				if(position[0]+dimension[0]/2 > start[0]+mDimension[0]*0.5/peaks)
 				{	slope *= -1;
 				}
-				else if(position[0] >= start[0]+mDimension[0]*i*0.4/peaks)
+				else if(position[0]+dimension[0]/2 >= start[0]+mDimension[0]*0.4/peaks)
 				{	slope /= 3;
 				}
+System.out.println("	Slope:"+((int)(slope*10))/10.0 +" x:"+(int)position[0]+" y:"+(int)position[1]);				
 				merge(mountain, newPolygon(position, dimension, slope));
-System.out.println("   Peak XEnd:"+ position[0]+" YEnd:"+ position[1]);				
 			}
-			position[0] += Math.abs(start[1]-position[1]);
-			position[1]	= start[1]; 
-System.out.println("   XFix:"+ position[0]+" YFix:"+ position[1]);				
+			double[] dimension = {mDimension[0]*i/peaks-position[0], Resolution[1]-position[1]};
+			double	slope = (start[1]-position[1])/dimension[0];
+			merge(mountain, newPolygon(position, dimension, slope));
+System.out.println("   Peak XEnd:"+ position[0]+" YEnd:"+ position[1]);				
 		}	
 		return mountain;
 	}
