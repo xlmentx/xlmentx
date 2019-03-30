@@ -50,7 +50,7 @@ public class Track
 		Polygon mountain = newMountain(position, dimension, 1);
 		mountain.setFill(Color.LIGHTSTEELBLUE);
 		background.getChildren().add(mountain);
-		
+	
 		// Midground
 		midground = new Group();
 		midground.setCache(true);
@@ -97,22 +97,21 @@ System.out.println("start Mountain:");
 		for(int i = 1; i <= peaks; i++)
 		{	double[] start = position.clone();
 System.out.println("   Peak XStart:"+ position[0]+" YStart:"+ position[1]);				
-			while(position[0]+widthRange[1] < start[0]+mDimension[0]*i/peaks)
+			while(position[0] <= start[0]+mDimension[0]*i/peaks && position[1] <= start[1])
 			{	double[] dimension = {random(widthRange), Resolution[1]-position[1]};
 				double 	 slope = -random(slopeRange, slopeRates);
-				if(position[0]+dimension[0]/2 > start[0]+mDimension[0]*i*0.5/peaks)
+				if(position[0] > start[0]+mDimension[0]*i*0.5/peaks)
 				{	slope *= -1;
 				}
-				else if(position[0]+dimension[0]/2 >= start[0]+mDimension[0]*i*0.4/peaks)
+				else if(position[0] >= start[0]+mDimension[0]*i*0.4/peaks)
 				{	slope /= 3;
 				}
 				merge(mountain, newPolygon(position, dimension, slope));
-System.out.println("	s:"+Math.signum(slope)+"	x:"+(int)position[0]);				
-			}
-			double[] dimension = {mDimension[0]*i/peaks-position[0], Resolution[1]-position[1]};
-			double	slope = (start[1]-position[1])/dimension[0]; 
-			merge(mountain, newPolygon(position, dimension, slope));
 System.out.println("   Peak XEnd:"+ position[0]+" YEnd:"+ position[1]);				
+			}
+			position[0] += Math.abs(start[1]-position[1]);
+			position[1]	= start[1]; 
+System.out.println("   XFix:"+ position[0]+" YFix:"+ position[1]);				
 		}	
 		return mountain;
 	}
