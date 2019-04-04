@@ -42,14 +42,14 @@ public class Track
 		background.setCacheHint(CacheHint.QUALITY);
 		
 		Polygon sky = newPolygon(new double[2], Resolution, 0);
-		sky.setFill(Color.DEEPSKYBLUE);
-		background.getChildren().add(sky);
+		//sky.setFill(Color.DEEPSKYBLUE);
+		//background.getChildren().add(sky);
 		
 		double [] position = {0, Resolution[1]*0.8},
 				  dimension = {Resolution[0], Resolution[1]};
 		Polygon mountain = newMountain(position, dimension, 1);
-		mountain.setFill(Color.LIGHTSTEELBLUE);
-		background.getChildren().add(mountain);
+		//mountain.setFill(Color.LIGHTSTEELBLUE);
+		//background.getChildren().add(mountain);
 		
 		// Midground
 		midground = new Group();
@@ -71,8 +71,8 @@ public class Track
 		while(position[0] < Resolution[0])
 		{	dimension = new double[]{random(xRange, pWidthRates), Resolution[0]};
 			Polygon runway = newPolygon(position, dimension, 0);
-			runway.setFill(Color.ALICEBLUE);
-			platforms.getChildren().add(runway);
+			//runway.setFill(Color.ALICEBLUE);
+			//platforms.getChildren().add(runway);
 		}
 		
 		while(position[0] < trackLength)
@@ -81,8 +81,8 @@ public class Track
 			dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
 			double 	 topSlope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
 			Polygon platform = newPolygon(position, dimension, topSlope);
-			platform.setFill(Color.ALICEBLUE);
-			platforms.getChildren().add(platform);
+			//platform.setFill(Color.ALICEBLUE);
+			//platforms.getChildren().add(platform);
 		}
 	}
 	
@@ -107,8 +107,21 @@ System.out.println("peakStart");
 				else if(position[0]+dimension[0]/2 >= start[0]+mDimension[0]*0.4/peaks)
 				{	slope /= 3;
 				}
-				double direction = Math.signum(position[0]-start[0]-mDimension[0]/2);
-System.out.println("slope"+(int)(slope*100)/100.00+" vs direction:"+direction);				
+				
+				double direction = -1;
+				if(position[0]+dimension[0]/2 > start[0]+mDimension[0]*0.5/peaks)
+				{	direction *= -1;
+				}
+				else if(position[0]+dimension[0]/2 >= start[0]+mDimension[0]*0.4/peaks)
+				{	direction /= 3;
+				}
+				double direction2 = Math.cbrt((position[0]+dimension[0]/2-start[0]-mDimension[0]*0.9/2)/(mDimension[0]/2));
+				
+				double direction3 = Math.cbrt((position[0]+dimension[0]/2-start[0])*2/mDimension[0]-1);
+System.out.println("d1:"+(int)(direction*10)/10.00
+					+"		d2:"+(int)(direction2*10)/10.00
+					+"		d3:"+(int)(direction3*10)/10.00);				
+	
 				merge(mountain, newPolygon(position, dimension, slope));
 			}
 			double[] dimension = {mDimension[0]*i/peaks-position[0], Resolution[1]-position[1]};
