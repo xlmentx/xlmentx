@@ -44,13 +44,13 @@ public class Track
 		background.setCacheHint(CacheHint.QUALITY);
 		
 		Polygon sky = newPolygon(new double[2], Resolution, 0);
-		sky.setFill(Color.DARKRED);
+		sky.setFill(Color.BLACK);
 		background.getChildren().add(sky);
 		
 		double [] position = {0, Resolution[1]*0.8},
 				  dimension = {Resolution[0], Resolution[1]};
 		Polygon mountain = newMountain(position, dimension, 1);
-		mountain.setFill(Color.ORANGERED);
+		mountain.setFill(Color.DIMGRAY);
 		background.getChildren().add(mountain);
 		
 		// Midground
@@ -66,7 +66,7 @@ public class Track
 		dimension = new double[]{Resolution[0], Resolution[1]};
 		Polygon hills = newMountain(position, dimension, 2);
 		
-		hills.setFill(Color.PURPLE);
+		hills.setFill(Color.DARKGRAY);
 		midground.getChildren().add(hills);
 		
 		// Platforms
@@ -78,7 +78,7 @@ public class Track
 		while(position[0] < Resolution[0])
 		{	dimension = new double[]{random(xRange, pWidthRates), Resolution[0]};
 			Polygon runway = newPolygon(position, dimension, 0);
-			runway.setFill(Color.DEEPPINK);
+			runway.setFill(Color.WHITE);
 			platforms.getChildren().add(runway);
 		}
 		
@@ -88,7 +88,7 @@ public class Track
 			dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
 			double 	 topSlope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
 			Polygon platform = newPolygon(position, dimension, topSlope);
-			platform.setFill(Color.DEEPPINK);
+			platform.setFill(Color.WHITE);
 			platforms.getChildren().add(platform);
 		}
 	}
