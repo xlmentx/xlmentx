@@ -45,7 +45,7 @@ public class Track
 		Polygon sky = newPolygon(new double[2], Resolution, 0);
 		sky.setFill(Color.BLACK);
 		background.getChildren().add(sky);
-		double [] position = {0, Resolution[1]}, //Resolution[1]*0.8},
+		double [] position = {0, Resolution[1]*0.8},
 				  dimension = {Resolution[0], Resolution[1]};
 		Polygon mountain = newMountain(position, dimension);
 		mountain.setFill(Color.DIMGRAY);
@@ -55,12 +55,12 @@ public class Track
 		
 		// Midground
 		midground = new Group();
-		position = new double[]{-Resolution[0], Resolution[1]*0.7};
+		position = new double[]{-Resolution[0], Resolution[1]*0.8};
 		dimension = new double[]{Resolution[0], Resolution[1]/3};
 		while(position[0] < tLength)
-		{	Polygon hills = newMountain(position, dimension);
-			hills.setFill(Color.DARKGRAY);
-			midground.getChildren().add(hills);
+		{	Polygon hill = newMountain(position, dimension);
+			hill.setFill(Color.DARKGRAY);
+			midground.getChildren().add(hill);
 		}
 
 		// Platforms
@@ -92,8 +92,13 @@ public class Track
 	{	double[] 	wRange = {0, dimension[0]*0.08},
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
+
+System.out.println("sPX: "+(int)position[0]
+			+"	sPY: "+(int)position[1]);
 		
 		Polygon mountain = new Polygon(position[0], Resolution[1], position[0], position[1]);	
+System.out.println("   sX: "+mountain.getPoints().get(mountain.getPoints().size()-2).intValue()
+				+"	sY: "+mountain.getPoints().get(mountain.getPoints().size()-1).intValue());
 		double[] start = position.clone();		
 		while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
 		{	double width = random(wRange),
@@ -103,8 +108,15 @@ public class Track
 			}
 			mountain.getPoints().addAll(position[0]+=width, position[1]+=width*slope);
 		}
-		position = new double[] {start[0]+dimension[0], start[1]};
+		position[0] = start[0]+dimension[0];
+		position[1] = start[1];
 		mountain.getPoints().addAll(position[0], position[1], position[0], Resolution[1]);
+System.out.println("   eX: "+mountain.getPoints().get(mountain.getPoints().size()-4).intValue()
+				+"	eY: "+mountain.getPoints().get(mountain.getPoints().size()-3).intValue()
+				);
+System.out.println("ePX: "+(int)position[0]
+		+"	ePY: "+(int)position[1]
+		+"\n");
 		return mountain;
 	}
 		
