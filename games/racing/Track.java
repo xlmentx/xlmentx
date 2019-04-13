@@ -42,11 +42,14 @@ public class Track
 	static void newTrack(int tLength)
 	{	// Background
 		background = new Group();
+		
 		Polygon sky = newPolygon(new double[2], Resolution, 0);
-		sky.setFill(Color.BLACK);
+		Color sColor = Color.BLACK;
+		sky.setFill(sColor);
 		background.getChildren().add(sky);
-		double [] position = {0, Resolution[1]*0.8},
-				  dimension = {Resolution[0], Resolution[1]};
+		
+		double [] position = {0, Resolution[1]*0.6},
+				  dimension = {Resolution[0], position[1]};
 		Polygon mountain = newMountain(position, dimension);
 		mountain.setFill(Color.DIMGRAY);
 		background.getChildren().add(mountain);
@@ -55,9 +58,9 @@ public class Track
 		
 		// Midground
 		midground = new Group();
-		position = new double[]{-Resolution[0], Resolution[1]*0.8};
-		dimension = new double[]{Resolution[0], Resolution[1]/3};
-		while(position[0] < tLength)
+		position = new double[]{-Resolution[0]/mDistance, Resolution[1]*0.7};
+		dimension = new double[]{Resolution[0], position[1]/2};
+		while(position[0] < tLength/mDistance+Resolution[0])
 		{	Polygon hill = newMountain(position, dimension);
 			hill.setFill(Color.DARKGRAY);
 			midground.getChildren().add(hill);
@@ -93,12 +96,7 @@ public class Track
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
 
-System.out.println("sPX: "+(int)position[0]
-			+"	sPY: "+(int)position[1]);
-		
-		Polygon mountain = new Polygon(position[0], Resolution[1], position[0], position[1]);	
-System.out.println("   sX: "+mountain.getPoints().get(mountain.getPoints().size()-2).intValue()
-				+"	sY: "+mountain.getPoints().get(mountain.getPoints().size()-1).intValue());
+		Polygon mountain = new Polygon((int)position[0], Resolution[1], (int)position[0], position[1]);	
 		double[] start = position.clone();		
 		while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
 		{	double width = random(wRange),
@@ -108,15 +106,8 @@ System.out.println("   sX: "+mountain.getPoints().get(mountain.getPoints().size(
 			}
 			mountain.getPoints().addAll(position[0]+=width, position[1]+=width*slope);
 		}
-		position[0] = start[0]+dimension[0];
-		position[1] = start[1];
-		mountain.getPoints().addAll(position[0], position[1], position[0], Resolution[1]);
-System.out.println("   eX: "+mountain.getPoints().get(mountain.getPoints().size()-4).intValue()
-				+"	eY: "+mountain.getPoints().get(mountain.getPoints().size()-3).intValue()
-				);
-System.out.println("ePX: "+(int)position[0]
-		+"	ePY: "+(int)position[1]
-		+"\n");
+		mountain.getPoints().addAll(position[0]=start[0]+dimension[0], position[1]=start[1]);
+		mountain.getPoints().addAll(position[0], Resolution[1]);
 		return mountain;
 	}
 		
@@ -161,14 +152,20 @@ System.out.println("ePX: "+(int)position[0]
 	static void translate(double[] cPosition) 
 	{	// Midground
 		midground.setTranslateX(cPosition[0]/mDistance);
-		/*for(int i = 0; i < midground.getChildren().size(); i++)
-		{	midground.getChildren().get(i).setVisible(false);
-			List<Double> points = ((Polygon)midground.getChildren().get(i)).getPoints();
-			if(points.get(0)+midground.getTranslateX() < Resolution[0] && points.get(points.size()-2)+midground.getTranslateX() > 0)
-			{	midground.getChildren().get(i).setVisible(true);
+		
+		double translation = midground.getTranslateX();
+		for(int i = 0; i < midground.getChildren().size(); i++)
+		{	Polygon p = (Polygon)midground.getChildren().get(i);
+			List<Double> points = p.getPoints();
+			double[] domain = {points.get(0), points.get(points.size()-2)};
+			if(domain[0]+translation < Resolution[0] && domain[1]+translation > 0)
+			{	p.setVisible(true);
+			}
+			else
+			{	p.setVisible(false);
 			}
 		}
-		*/
+		
 		// Platforms
 		platforms.setTranslateY(cPosition[1]);
 		platforms.setTranslateX(cPosition[0]);
