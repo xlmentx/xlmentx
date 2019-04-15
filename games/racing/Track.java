@@ -8,8 +8,10 @@ import java.util.Random;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Polygon;
@@ -45,7 +47,7 @@ public class Track
 		background = new Group();
 		
 		Polygon sky = newPolygon(new double[2], Resolution, 0);
-		Color sColor = Color.BLACK;
+		Color sColor = Color.SKYBLUE;
 		sky.setFill(sColor);
 		background.getChildren().add(sky);
 		
@@ -108,19 +110,10 @@ public class Track
 		mountain.getPoints().addAll(position[0]=start[0]+dimension[0], position[1]=start[1]);
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Color blue = new Color(0, 0, 1, 1.0);
-		Color yellow = new Color(1, 1, 0, 1);
-		System.out.println("blue 	r:"+blue.getRed()+" g:"+blue.getGreen()+" b:"+blue.getBlue());
-		System.out.println("yellow	r:"+yellow.getRed()+" g:"+yellow.getGreen()+" b:"+yellow.getBlue());
-		
-		Color mix = blue.interpolate(yellow, 0);
-		//Color.hsb((blue.getHue()+yellow.getHue())/2, (blue.getSaturation()+yellow.getSaturation())/2, (blue.getBrightness()+yellow.getBrightness())/2,(blue.getOpacity()+yellow.getOpacity())/2);
-		
-		System.out.println("mixed	r:"+mix.getRed()+" g:"+mix.getGreen()+" b:"+mix.getBlue());
-		
-		//Stop[] stops = new Stop[] {new Stop(0, mColor),  new Stop(1, sColor)};
-		//LinearGradient l = new LinearGradient(	0, 0, 0, dimension[1], false, CycleMethod.NO_CYCLE, stops);
-		mountain.setFill(mix);
+		ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainRocky.png"));
+		//ImagePattern m = new ImagePattern(new Image("/image/scenery/Mountain.png"));
+		//ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainLow.png"));
+		mountain.setFill(m);
 		
 		return mountain;
 	}
