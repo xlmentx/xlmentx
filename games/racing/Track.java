@@ -8,6 +8,7 @@ import java.util.Random;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -38,6 +39,8 @@ public class Track
 	private static Group 	background,  midground,  platforms;
 	private static int 		mDistance = 30;
 	
+	private static Color 	sColor = Color.SKYBLUE;
+	
 	// Private Constructor
 	private Track(){}
 	
@@ -47,7 +50,6 @@ public class Track
 		background = new Group();
 		
 		Polygon sky = newPolygon(new double[2], Resolution, 0);
-		Color sColor = Color.SKYBLUE;
 		sky.setFill(sColor);
 		background.getChildren().add(sky);
 		
@@ -113,6 +115,9 @@ public class Track
 		ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainRocky.png"));
 		//ImagePattern m = new ImagePattern(new Image("/image/scenery/Mountain.png"));
 		//ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainLow.png"));
+		ColorAdjust colorAdjust = new ColorAdjust(sColor.getHue(),sColor.getSaturation(),sColor.getBrightness(),);
+		 
+		
 		mountain.setFill(m);
 		
 		return mountain;
