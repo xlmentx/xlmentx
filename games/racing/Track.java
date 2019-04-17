@@ -8,7 +8,9 @@ import java.util.Random;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -115,10 +117,12 @@ public class Track
 		ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainRocky.png"));
 		//ImagePattern m = new ImagePattern(new Image("/image/scenery/Mountain.png"));
 		//ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainLow.png"));
-		ColorAdjust colorAdjust = new ColorAdjust(sColor.getHue(),sColor.getSaturation(),sColor.getBrightness(),);
-		 
-		
 		mountain.setFill(m);
+		
+		//BoxBlur blur = new BoxBlur(width,height,iterations);
+		
+		InnerShadow shadow = new InnerShadow(200, 0, -dimension[1], Color.SKYBLUE);
+		mountain.setEffect(shadow);
 		
 		return mountain;
 	}
