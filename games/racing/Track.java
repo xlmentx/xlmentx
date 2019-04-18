@@ -8,14 +8,23 @@ import java.util.Random;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.BlurType;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.ImageInput;
 import javafx.scene.effect.InnerShadow;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Light.Distant;
+import javafx.scene.effect.Lighting;
+import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
@@ -41,7 +50,7 @@ public class Track
 	private static Group 	background,  midground,  platforms;
 	private static int 		mDistance = 30;
 	
-	private static Color 	sColor = Color.SKYBLUE;
+	private static Color 	sColor = Color.DEEPSKYBLUE;
 	
 	// Private Constructor
 	private Track(){}
@@ -51,14 +60,17 @@ public class Track
 	{	// Background
 		background = new Group();
 		
-		Polygon sky = newPolygon(new double[2], Resolution, 0);
-		sky.setFill(sColor);
+		Polygon sky = newPolygon(new double[2], Resolution, 0, sColor);
 		background.getChildren().add(sky);
 		
 		double [] position = {0, Resolution[1]*0.6},
 				  dimension = {Resolution[0], position[1]};
-		Polygon mountain = newMountain(position, dimension);
+		ImagePattern p = new ImagePattern(new Image("/image/scenery/MountainRocky.png"));
+		//ImagePattern m = new ImagePattern(new Image("/image/scenery/Mountain.png"));
+		//ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainLow.png"));
+		Polygon mountain = newMountain(position, dimension, p);
 		background.getChildren().add(mountain);
+		
 		background.setCache(true);
 		background.setCacheHint(CacheHint.QUALITY);
 		
@@ -79,8 +91,7 @@ public class Track
 		position = new double[]{-Resolution[0], Resolution[1]*0.8};
 		while(position[0] < Resolution[0])
 		{	dimension = new double[]{random(xRange, pWidthRates), Resolution[0]};
-			Polygon runway = newPolygon(position, dimension, 0);
-			runway.setFill(Color.WHITE);
+			Polygon runway = newPolygon(position, dimension, 0, Color.WHITE);
 			platforms.getChildren().add(runway);
 		}
 		
@@ -89,14 +100,13 @@ public class Track
 			position[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
 			dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
 			double 	 topSlope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
-			Polygon platform = newPolygon(position, dimension, topSlope);
-			platform.setFill(Color.WHITE);
+			Polygon platform = newPolygon(position, dimension, topSlope, Color.WHITE);
 			platforms.getChildren().add(platform);
 		}
 	}
 	
 	// Create Mountain
-	private static Polygon newMountain(double[] position,  double[] dimension)
+	private static Polygon newMountain(double[] position,  double[] dimension, Paint fill)
 	{	double[] 	wRange = {0, dimension[0]*0.08},
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
@@ -113,32 +123,21 @@ public class Track
 		}
 		mountain.getPoints().addAll(position[0]=start[0]+dimension[0], position[1]=start[1]);
 		mountain.getPoints().addAll(position[0], Resolution[1]);
-		
-		ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainRocky.png"));
-		//ImagePattern m = new ImagePattern(new Image("/image/scenery/Mountain.png"));
-		//ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainLow.png"));
-		mountain.setFill(m);
-		
-		//BoxBlur blur = new BoxBlur(width,height,iterations);
-		
-		InnerShadow shadow = new InnerShadow(200, 0, -dimension[1], Color.SKYBLUE);
-		mountain.setEffect(shadow);
-		
+		mountain.setFill(fill);
 		return mountain;
 	}
 		
 	// Create Polygon
-	private static Polygon newPolygon(double[] position, double[] dimension, double slope)
+	private static Polygon newPolygon(double[] position, double[] dimension, double slope, Paint fill)
 	{	Polygon p = new Polygon
 		(	(int)position[0], 			position[1],
 			position[0]+dimension[0], 	position[1]+dimension[0]*slope,
 			position[0]+dimension[0], 	position[1]+dimension[1],
 			(int)position[0], 			position[1]+dimension[1]
 		);
-	
-		// Next Position
 		position[0] += dimension[0];
 		position[1] += dimension[0]*slope;
+		p.setFill(fill);
 		return p;
 	}
 	
