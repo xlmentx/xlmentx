@@ -13,6 +13,7 @@ import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.ColorInput;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.ImageInput;
 import javafx.scene.effect.InnerShadow;
@@ -49,35 +50,37 @@ public class Track
 							pDeclineRates =	{0.0,   0.0,   	0.0}; 
 					
 	private static Group 	background,  midground,  platforms;
-	private static int 		mDistance = 30;
+	private static int 		mDistance = 50;
 	
-	private static Color 	sColor = Color.DEEPSKYBLUE,
-							gColor = Color.ANTIQUEWHITE;
-	
+	private static Color 	sColor = Color.BLACK,
+							gColor = Color.DARKBLUE,
+							fColor = Color.WHITE;
 	// Private Constructor
 	private Track(){}
 	
 	// Creates New Track
 	static void newTrack(int tLength)
 	{	// Background
-		background = new Group();
 		Polygon  sky = newPolygon(Resolution, sColor);
 		double[] position = {0, Resolution[1]*0.6},
 				 dimension = {Resolution[0], Resolution[1]*0.6};
-		Polygon  mountain = newMountain(position, dimension, blend(gColor, sColor, 0.4));
-		mountain.setEffect(new DropShadow(127, Color.WHITE));
+		Polygon  mountain = newMountain(position, dimension, 1, gColor);
+		//mountain.setEffect(new DropShadow(127, fColor));
+		
+		background = new Group();
 		background.getChildren().addAll(sky, mountain);
 		background.setCache(true);
 		background.setCacheHint(CacheHint.QUALITY);
 		
 		// Midground
-		midground = new Group();
 		position = new double[]{-Resolution[0]/mDistance, Resolution[1]*0.7};
 		dimension = new double[]{Resolution[0], Resolution[1]*0.4};
-		while(position[0] < tLength/mDistance+Resolution[0])
-		{	Polygon hill = newMountain(position, dimension, blend(gColor, sColor, 0.2));
-			midground.getChildren().add(hill);
-		}
+		Polygon hill = newMountain(position, dimension, tLength/mDistance, gColor);
+		hill.setEffect(new DropShadow(127, fColor));
+		
+		midground = new Group();
+		//midground.getChildren().add(hill);
+		
 
 		// Platforms
 		platforms = new Group();
@@ -100,23 +103,26 @@ public class Track
 	}
 	
 	// Create Mountain
-	private static Polygon newMountain(double[] position,  double[] dimension, Paint fill)
+	private static Polygon newMountain(double[] position,  double[] dimension, int peaks, Paint fill)
 	{	double[] 	wRange = {0, dimension[0]*0.08},
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
 
 		Polygon mountain = new Polygon((int)position[0], Resolution[1], (int)position[0], position[1]);	
-		double[] start = position.clone();		
-		while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
-		{	double width = random(wRange),
-				   slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
-			if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
-			{	slope /= 3;
+		for(int i = 0; i < peaks; i++)
+		{	double[] start = position.clone();		
+			while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
+			{	double width = random(wRange),
+				   	   slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
+				if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
+				{	slope /= 3;
+				}
+				mountain.getPoints().addAll(position[0]+=width, position[1]+=width*slope);
 			}
-			mountain.getPoints().addAll(position[0]+=width, position[1]+=width*slope);
+			mountain.getPoints().addAll(position[0]=start[0]+dimension[0], position[1]=start[1]);
 		}
-		mountain.getPoints().addAll(position[0]=start[0]+dimension[0], position[1]=start[1]);
 		mountain.getPoints().addAll(position[0], Resolution[1]);
+		
 		mountain.setFill(fill);
 		return mountain;
 	}
