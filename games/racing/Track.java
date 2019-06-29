@@ -52,6 +52,7 @@ public class Track
 	private static Group 	background,  midground,  platforms;
 	private static int 		mDistance = 50;
 	
+	private static Image ground = new Image("");
 	private static Color 	sColor = Color.BLACK,
 							gColor = Color.DARKBLUE,
 							fColor = Color.WHITE;
@@ -64,7 +65,7 @@ public class Track
 		Polygon  sky = newPolygon(Resolution, sColor);
 		double[] position = {0, Resolution[1]*0.6},
 				 dimension = {Resolution[0], Resolution[1]*0.6};
-		Polygon  mountain = newMountain(position, dimension, 1, gColor);
+		Polygon  mountain = newMountain(position, dimension, 1, new Image());
 		//mountain.setEffect(new DropShadow(127, fColor));
 		
 		background = new Group();
