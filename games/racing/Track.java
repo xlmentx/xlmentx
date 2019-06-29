@@ -13,6 +13,7 @@ import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.ImageInput;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.effect.Light;
@@ -50,7 +51,8 @@ public class Track
 	private static Group 	background,  midground,  platforms;
 	private static int 		mDistance = 30;
 	
-	private static Color 	sColor = Color.DEEPSKYBLUE;
+	private static Color 	sColor = Color.DEEPSKYBLUE,
+							gColor = Color.ANTIQUEWHITE;
 	
 	// Private Constructor
 	private Track(){}
@@ -59,50 +61,42 @@ public class Track
 	static void newTrack(int tLength)
 	{	// Background
 		background = new Group();
-		
-		Polygon sky = newPolygon(new double[2], Resolution, 0, sColor);
-		background.getChildren().add(sky);
-		
-		double [] position = {0, Resolution[1]*0.6},
-				  dimension = {Resolution[0], position[1]};
-		ImagePattern p = new ImagePattern(new Image("/image/scenery/MountainRocky.png"));
-		//ImagePattern m = new ImagePattern(new Image("/image/scenery/Mountain.png"));
-		//ImagePattern m = new ImagePattern(new Image("/image/scenery/MountainLow.png"));
-		Polygon mountain = newMountain(position, dimension, p);
-		background.getChildren().add(mountain);
-		
+		Polygon  sky = newPolygon(Resolution, sColor);
+		double[] position = {0, Resolution[1]*0.6},
+				 dimension = {Resolution[0], Resolution[1]*0.6};
+		Polygon  mountain = newMountain(position, dimension, blend(gColor, sColor, 0.4));
+		mountain.setEffect(new DropShadow(127, Color.WHITE));
+		background.getChildren().addAll(sky, mountain);
 		background.setCache(true);
 		background.setCacheHint(CacheHint.QUALITY);
 		
 		// Midground
 		midground = new Group();
 		position = new double[]{-Resolution[0]/mDistance, Resolution[1]*0.7};
-		dimension = new double[]{Resolution[0], position[1]/2};
-		//while(position[0] < tLength/mDistance+Resolution[0])
-		{	//Polygon hill = newMountain(position, dimension);
-			//midground.getChildren().add(hill);
+		dimension = new double[]{Resolution[0], Resolution[1]*0.4};
+		while(position[0] < tLength/mDistance+Resolution[0])
+		{	Polygon hill = newMountain(position, dimension, blend(gColor, sColor, 0.2));
+			midground.getChildren().add(hill);
 		}
 
 		// Platforms
 		platforms = new Group();
-		platforms.setCache(true);
-		platforms.setCacheHint(CacheHint.SPEED);
-		
 		position = new double[]{-Resolution[0], Resolution[1]*0.8};
 		while(position[0] < Resolution[0])
 		{	dimension = new double[]{random(xRange, pWidthRates), Resolution[0]};
-			Polygon runway = newPolygon(position, dimension, 0, Color.WHITE);
-			platforms.getChildren().add(runway);
+			platforms.getChildren().add(newPolygon(position, dimension, 0, gColor));
 		}
 		
 		while(position[0] < tLength)
 		{	position[0] += random(xRange, pGapRates, 0);
 			position[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
 			dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
-			double 	 topSlope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
-			Polygon platform = newPolygon(position, dimension, topSlope, Color.WHITE);
-			platforms.getChildren().add(platform);
+			double slope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
+			platforms.getChildren().add(newPolygon(position, dimension, slope, gColor));
 		}
+		platforms.setCache(true);
+		platforms.setCacheHint(CacheHint.SPEED);
+		
 	}
 	
 	// Create Mountain
@@ -128,6 +122,9 @@ public class Track
 	}
 		
 	// Create Polygon
+	private static Polygon newPolygon(double[] dimension, Paint fill)
+	{	return newPolygon(new double[2], dimension, 0, fill);
+	}
 	private static Polygon newPolygon(double[] position, double[] dimension, double slope, Paint fill)
 	{	Polygon p = new Polygon
 		(	(int)position[0], 			position[1],
@@ -141,6 +138,14 @@ public class Track
 		return p;
 	}
 	
+	// Blend Colors
+	private static Color blend(Color a, Color b, double ratio)
+	{	return Color.rgb
+		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*ratio)), 
+			(int)(255*(a.getGreen()+(b.getGreen()-a.getGreen())*ratio)), 
+			(int)(255*(a.getBlue()+(b.getBlue()-a.getBlue())*ratio))
+		);
+	}
 	
 	
 	// Random Values
