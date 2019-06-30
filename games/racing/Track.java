@@ -55,9 +55,8 @@ public class Track
 	private static Color 	sColor = Color.BLACK,
 							gColor = Color.DARKBLUE,
 							fColor = Color.WHITE;
-	private static Image 	groundL = new Image("image/scenery/Mountain.png"),
-							groundM = new Image("image/scenery/Mountain.png"),
-							groundH = new Image("image/scenery/Mountain.png");
+	private static Image 	ground = new Image("image/scenery/Mountain.png");
+	private static ImagePattern gTexture = new ImagePattern(ground);
 	
 	
 	// Private Constructor
@@ -68,10 +67,13 @@ public class Track
 	{	// Background
 		background = new Group();
 		Polygon  sky = newPolygon(Resolution, sColor);
+		
 		double[] mPosition = {0, Resolution[1]*0.6},
 				 mDimension = {Resolution[0], Resolution[1]*0.6};
-		Polygon  mountain = newMountain(mPosition, mDimension, 1, new ImagePattern(groundL));
+		ImagePattern mTexture = blend(gTexture, sColor, 0.3);
+		Polygon  mountain = newMountain(mPosition, mDimension, 1, mTexture);
 		mountain.setEffect(new DropShadow(127, fColor));
+		
 		background.getChildren().addAll(sky, mountain);
 		background.setCache(true);
 		background.setCacheHint(CacheHint.QUALITY);
@@ -81,7 +83,7 @@ public class Track
 		double[] hPosition = {-Resolution[0]/mDistance, Resolution[1]*0.7},
 				 hDimension = {Resolution[0], Resolution[1]*0.4};
 		for(int i = 0; i < 5; i++)
-		{	Polygon hill = newMountain(hPosition, hDimension, 1, new ImagePattern(groundM));
+		{	Polygon hill = newMountain(hPosition, hDimension, 1, gTexture);
 			midground.getChildren().add(hill);
 		}
 		midground.setEffect(new DropShadow(127, fColor));
@@ -92,7 +94,7 @@ public class Track
 		double[] pPosition = {-Resolution[0], Resolution[1]*0.8};
 		while(pPosition[0] < Resolution[0])
 		{	double[] pDimension = {random(xRange, pWidthRates), Resolution[0]};
-			platforms.getChildren().add(newPolygon(pPosition, pDimension, 0, new ImagePattern(groundH)));
+			platforms.getChildren().add(newPolygon(pPosition, pDimension, 0, gTexture));
 		}
 		
 		while(pPosition[0] < tLength)
@@ -100,7 +102,7 @@ public class Track
 			pPosition[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
 			double[] pDimension = {random(xRange, pWidthRates, xRange[0]), Resolution[0]};
 			double slope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
-			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope, new ImagePattern(groundH)));
+			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope, gTexture));
 		}
 		platforms.setCache(true);
 		platforms.setCacheHint(CacheHint.SPEED);
