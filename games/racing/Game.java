@@ -57,7 +57,7 @@ public class Game extends Application
 		Pane GamePane = new Pane();
 		GamePane.getChildren().add(Track.getBackground());
 		GamePane.getChildren().add(Track.getMidground());
-		//GamePane.getChildren().add(Track.getForeground());
+		GamePane.getChildren().add(Track.getForeground());
 		GamePane.getChildren().add(Track.getPlatforms());
 		GamePane.getChildren().add(player.get(0).getRacer());
 		root.getChildren().add(GamePane);
