@@ -52,55 +52,58 @@ public class Track
 	private static Group 	background,  midground,  platforms;
 	private static int 		mDistance = 50;
 	
-	private static Image ground = new Image("");
 	private static Color 	sColor = Color.BLACK,
 							gColor = Color.DARKBLUE,
 							fColor = Color.WHITE;
+	private static Image 	groundL = new Image("image/scenery/Mountain.png"),
+							groundM = new Image("image/scenery/Mountain.png"),
+							groundH = new Image("image/scenery/Mountain.png");
+	
+	
 	// Private Constructor
 	private Track(){}
 	
 	// Creates New Track
 	static void newTrack(int tLength)
 	{	// Background
-		Polygon  sky = newPolygon(Resolution, sColor);
-		double[] position = {0, Resolution[1]*0.6},
-				 dimension = {Resolution[0], Resolution[1]*0.6};
-		Polygon  mountain = newMountain(position, dimension, 1, new Image());
-		//mountain.setEffect(new DropShadow(127, fColor));
-		
 		background = new Group();
+		Polygon  sky = newPolygon(Resolution, sColor);
+		double[] mPosition = {0, Resolution[1]*0.6},
+				 mDimension = {Resolution[0], Resolution[1]*0.6};
+		Polygon  mountain = newMountain(mPosition, mDimension, 1, new ImagePattern(groundL));
+		mountain.setEffect(new DropShadow(127, fColor));
 		background.getChildren().addAll(sky, mountain);
 		background.setCache(true);
 		background.setCacheHint(CacheHint.QUALITY);
 		
 		// Midground
-		position = new double[]{-Resolution[0]/mDistance, Resolution[1]*0.7};
-		dimension = new double[]{Resolution[0], Resolution[1]*0.4};
-		Polygon hill = newMountain(position, dimension, tLength/mDistance, gColor);
-		hill.setEffect(new DropShadow(127, fColor));
-		
 		midground = new Group();
-		//midground.getChildren().add(hill);
+		double[] hPosition = {-Resolution[0]/mDistance, Resolution[1]*0.7},
+				 hDimension = {Resolution[0], Resolution[1]*0.4};
+		for(int i = 0; i < 5; i++)
+		{	Polygon hill = newMountain(hPosition, hDimension, 1, new ImagePattern(groundM));
+			midground.getChildren().add(hill);
+		}
+		midground.setEffect(new DropShadow(127, fColor));
 		
 
 		// Platforms
 		platforms = new Group();
-		position = new double[]{-Resolution[0], Resolution[1]*0.8};
-		while(position[0] < Resolution[0])
-		{	dimension = new double[]{random(xRange, pWidthRates), Resolution[0]};
-			platforms.getChildren().add(newPolygon(position, dimension, 0, gColor));
+		double[] pPosition = {-Resolution[0], Resolution[1]*0.8};
+		while(pPosition[0] < Resolution[0])
+		{	double[] pDimension = {random(xRange, pWidthRates), Resolution[0]};
+			platforms.getChildren().add(newPolygon(pPosition, pDimension, 0, new ImagePattern(groundH)));
 		}
 		
-		while(position[0] < tLength)
-		{	position[0] += random(xRange, pGapRates, 0);
-			position[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
-			dimension = new double[]{random(xRange, pWidthRates, xRange[0]), Resolution[0]};
+		while(pPosition[0] < tLength)
+		{	pPosition[0] += random(xRange, pGapRates, 0);
+			pPosition[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
+			double[] pDimension = {random(xRange, pWidthRates, xRange[0]), Resolution[0]};
 			double slope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
-			platforms.getChildren().add(newPolygon(position, dimension, slope, gColor));
+			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope, new ImagePattern(groundH)));
 		}
 		platforms.setCache(true);
 		platforms.setCacheHint(CacheHint.SPEED);
-		
 	}
 	
 	// Create Mountain
