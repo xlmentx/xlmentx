@@ -60,7 +60,7 @@ public class Track
 	private static Color 	sColor = Color.DEEPSKYBLUE,
 							gColor = Color.SANDYBROWN,
 							fColor = Color.WHITE;
-	private static Image 	ground = new Image("image/scenery/Mountain.png");
+	private static Image 	rocks = new Image("image/scenery/Rocks.png");
 	
 	
 	// Private Constructor
@@ -73,7 +73,7 @@ public class Track
 		Polygon  sky = newPolygon(new double[2], Resolution, 0, sColor);
 		double[] mPosition = {0, Resolution[1]*0.5},
 				 mDimension = {Resolution[0], Resolution[1]*0.3};
-		Paint 	 mTexture = blend(gColor, sColor, 0.5);
+		Paint 	 mTexture = blend(rocks, sColor, 0.5);
 		Polygon  bMountain = newMountain(mPosition, mDimension, mTexture);
 		bMountain.setEffect(new DropShadow(127, fColor));
 		background.getChildren().addAll(sky, bMountain);
@@ -83,7 +83,7 @@ public class Track
 		// Midground
 		midground = new Group();
 		mPosition = new double[] {-mDimension[0]/2, Resolution[1]*0.6};
-		mTexture = blend(gColor, sColor, mDistance/bDistance*0.5);
+		mTexture = blend(rocks, sColor, mDistance/bDistance*0.5);
 		for(int i = 0; i < tLength/mDistance; i++)
 		{	Polygon mMountain = newMountain(mPosition, mDimension, mTexture);
 			midground.getChildren().add(mMountain);
@@ -93,7 +93,7 @@ public class Track
 		// Foreground
 		foreground = new Group();
 		mPosition = new double[] {-mDimension[0]/5, Resolution[1]*0.7};
-		mTexture = blend(gColor, sColor, fDistance/bDistance*0.5);
+		mTexture = blend(rocks, sColor, fDistance/bDistance*0.5);
 		for(int i = 0; i < tLength/fDistance; i++)
 		{	Polygon fMountain = newMountain(mPosition, mDimension, mTexture);
 			foreground.getChildren().add(fMountain);
@@ -103,7 +103,7 @@ public class Track
 		// Platforms
 		platforms = new Group();
 		double[] pPosition = {-Resolution[0], Resolution[1]*0.8};
-		Paint 	 pTexture = blend(gColor, sColor, 0);
+		Paint 	 pTexture = blend(rocks, sColor, 0);
 		while(pPosition[0] < Resolution[0])
 		{	double[] pDimension = {random(xRange, pWidthRates), Resolution[0]};
 			platforms.getChildren().add(newPolygon(pPosition, pDimension, 0, pTexture));
@@ -164,6 +164,7 @@ public class Track
 	    	{	bWriter.setColor(x, y, blend(iReader.getColor(x, y), c, ratio));              
     		}
     	}
+		
 		return new ImagePattern(bImage);
 	}
 	private static Color blend(Color a, Color b, double ratio)
