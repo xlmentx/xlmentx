@@ -94,7 +94,7 @@ public class Track
 		
 		// Foreground
 		foreground = new Group();
-		mPosition = new double[] {-mDimension[0]*0.5, Resolution[1]*0.7};
+		mPosition = new double[] {-mDimension[0]*0.6, Resolution[1]*0.7};
 		mDimension = new double[] {Resolution[0], Resolution[1]*0.3};
 		for(int i = 0; i < tLength/fDistance; i++)
 		{	Polygon fMountain = newMountain(mPosition, mDimension, fDistance);
