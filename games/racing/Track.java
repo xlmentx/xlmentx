@@ -25,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.ImagePattern;
@@ -55,11 +56,11 @@ public class Track
 							pDeclineRates =	{0.0,   0.0,   	0.0}; 
 					
 	private static Group 	background,  midground, foreground, platforms;
-	private static double 	bDistance = 2400,
-							mDistance = 1200,
-							fDistance = 400;
-							//pDistance = 1;
-	
+												//i+1	j+1	   original
+	private static double 	m1Distance = 2400, 	//2400	2400   2400
+							m2Distance = 1200, 	//1200	1200   1200
+							m3Distance = 600;  	//800	600	   400
+							
 	private static Color 	lColor = Color.LIGHTGOLDENRODYELLOW,
 							sColor = Color.DEEPSKYBLUE,
 							fColor = Color.WHITE,
@@ -75,32 +76,26 @@ public class Track
 	static void newTrack(int tLength)
 	{	// Background
 		background = new Group();
-		Rectangle  sky = new Rectangle(Resolution[0], Resolution[1], sColor);
-		double[] mPosition = {0, Resolution[1]*0.5},
-				 mDimension = {Resolution[0], Resolution[1]*0.3};
-		Polygon  bMountain = newMountain(mPosition, mDimension, bDistance);
-		bMountain.setEffect(new DropShadow(127, fColor));
-		background.getChildren().addAll(sky, bMountain);
+		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
+		double[] mDimension = {Resolution[0], Resolution[1]*0.3},
+				 m1Position = {0, Resolution[1]*0.5},
+				 m2Position = {-mDimension[0]*0.2, Resolution[1]*0.6},
+				 m3Position = {-mDimension[0]*0.6, Resolution[1]*0.7};
+		background.getChildren().add(newMountain(m1Position, mDimension, 1, m1Distance));
+		background.getChildren().add(newMountain(m2Position, mDimension, 2, m2Distance));
+		background.getChildren().add(newMountain(m3Position, mDimension, 3, m3Distance));
 		
-		// Midground
-		midground = new Group();
-		mPosition = new double[] {-mDimension[0]*0.2, Resolution[1]*0.6};
-		mDimension = new double[] {Resolution[0], Resolution[1]*0.3};
-		for(int i = 0; i < tLength/mDistance; i++)
-		{	Polygon mMountain = newMountain(mPosition, mDimension, mDistance);
-			midground.getChildren().add(mMountain);
-		}
-		midground.setEffect(new DropShadow(127, fColor));
 		
-		// Foreground
-		foreground = new Group();
-		mPosition = new double[] {-mDimension[0]*0.6, Resolution[1]*0.7};
-		mDimension = new double[] {Resolution[0], Resolution[1]*0.3};
-		for(int i = 0; i < tLength/fDistance; i++)
-		{	Polygon fMountain = newMountain(mPosition, mDimension, fDistance);
-			foreground.getChildren().add(fMountain);
-		}
-		foreground.setEffect(new DropShadow(127, fColor));
+		// Background
+		background = new Group();
+		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
+		for(int i = 0, j = 0, k = 1; i < 5; i++, j+=i, k += Math.pow(k, i))
+		{	double[] dimension = {Resolution[0], Resolution[1]*0.3},
+					 position = {-dimension[0]*0.3*i, Resolution[1]*(0.1*i+0.5)};
+			double 	 distance = m1Distance/(j+1);
+System.out.println("i:"+i+"	j:"+j+"	i^2:"+i*i+" k:"+k);
+			background.getChildren().add(newMountain(position, mDimension, i+1, distance));
+		}	
 		
 		// Platforms
 		platforms = new Group();
@@ -119,27 +114,30 @@ public class Track
 	}
 	
 	// Create Mountain
-	private static Polygon newMountain(double[] position, double[] dimension, double distance)
+	private static Polygon newMountain(double[] position, double[] dimension, int peaks, double distance)
 	{	double[] 	wRange = {0, dimension[0]*0.08},
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
 
-		Polygon mountain = new Polygon(position[0]-1, Resolution[1], position[0]-1, position[1]);	
-		double[] start = position.clone();		
-		while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
-		{	double width = random(wRange),
-			   	   slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
-			if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
-			{	slope /= 3;
+		Polygon mountain = new Polygon(position[0], Resolution[1], position[0], position[1]);	
+		for(int i = 0; i < peaks; i++) 
+    	{	double[] start = position.clone();		
+			while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
+			{	double width = random(wRange),
+			   	   	   slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
+				if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
+				{	slope /= 3;
+				}
+				mountain.getPoints().addAll(position[0] += width, position[1] += width*slope);
 			}
-			mountain.getPoints().addAll(position[0] += width, position[1] += width*slope);
+			mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 		}
-		mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance/bDistance*0.5)),
-			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance/bDistance*0.5));
-		mountain.setFill( new RadialGradient(-90, 1, 0.5, 0.9, 1, true, null, highlight, shadow));
+		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance/m1Distance*0.5)),
+			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance/m1Distance*0.5));
+		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
+		mountain.setEffect(new DropShadow(127, fColor));
 		
 		return mountain;
 	}
@@ -202,11 +200,10 @@ public class Track
 	
 	// Track Update
 	static void translate(double[] cPosition) 
-	{	// Midground
-		midground.setTranslateX(cPosition[0]/mDistance);
-		
-		// Foreground
-		foreground.setTranslateX(cPosition[0]/fDistance);
+	{	// Background
+		background.getChildren().get(1).setTranslateX(cPosition[0]/m1Distance);
+		background.getChildren().get(2).setTranslateX(cPosition[0]/m2Distance);
+		background.getChildren().get(3).setTranslateX(cPosition[0]/m3Distance);
 		
 		// Platforms
 		platforms.setTranslateY(cPosition[1]);
