@@ -8,6 +8,7 @@ import java.util.Random;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.BlurType;
@@ -57,9 +58,7 @@ public class Track
 					
 	private static Group 	background,  midground, foreground, platforms;
 												//i+1	j+1	   original
-	private static double 	m1Distance = 2400, 	//2400	2400   2400
-							m2Distance = 1200, 	//1200	1200   1200
-							m3Distance = 600;  	//800	600	   400
+	private static double 	mDistance = 0; 	//2400	2400   2400
 							
 	private static Color 	lColor = Color.LIGHTGOLDENRODYELLOW,
 							sColor = Color.DEEPSKYBLUE,
@@ -77,24 +76,18 @@ public class Track
 	{	// Background
 		background = new Group();
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
-		double[] mDimension = {Resolution[0], Resolution[1]*0.3},
-				 m1Position = {0, Resolution[1]*0.5},
-				 m2Position = {-mDimension[0]*0.2, Resolution[1]*0.6},
-				 m3Position = {-mDimension[0]*0.6, Resolution[1]*0.7};
-		background.getChildren().add(newMountain(m1Position, mDimension, 1, m1Distance));
-		background.getChildren().add(newMountain(m2Position, mDimension, 2, m2Distance));
-		background.getChildren().add(newMountain(m3Position, mDimension, 3, m3Distance));
-		
-		
-		// Background
-		background = new Group();
-		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
-		for(int i = 0, j = 0, k = 1; i < 5; i++, j+=i, k += Math.pow(k, i))
+		for(int i = 0, layers = 3; i < layers; i++)
 		{	double[] dimension = {Resolution[0], Resolution[1]*0.3},
-					 position = {-dimension[0]*0.3*i, Resolution[1]*(0.1*i+0.5)};
-			double 	 distance = m1Distance/(j+1);
-System.out.println("i:"+i+"	j:"+j+"	i^2:"+i*i+" k:"+k);
-			background.getChildren().add(newMountain(position, mDimension, i+1, distance));
+					 
+			position = {-dimension[0]*i*(i+1)/2.0/layers, 
+			
+					
+					
+					Resolution[1]*(0.1*i+0.5)};
+			double 	 distance = 1-(double)(i+1)/(layers+1+mDistance);
+			background.getChildren().add(newMountain(position, dimension, i+1, distance));
+
+System.out.println("i:"+i+" l:"+layers+" d:"+mDistance+" offset:"+i*(i+1)/2.0/layers);
 		}	
 		
 		// Platforms
@@ -134,8 +127,8 @@ System.out.println("i:"+i+"	j:"+j+"	i^2:"+i*i+" k:"+k);
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance/m1Distance*0.5)),
-			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance/m1Distance*0.5));
+		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance)),
+			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance));
 		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
 		mountain.setEffect(new DropShadow(127, fColor));
 		
@@ -201,10 +194,11 @@ System.out.println("i:"+i+"	j:"+j+"	i^2:"+i*i+" k:"+k);
 	// Track Update
 	static void translate(double[] cPosition) 
 	{	// Background
-		background.getChildren().get(1).setTranslateX(cPosition[0]/m1Distance);
-		background.getChildren().get(2).setTranslateX(cPosition[0]/m2Distance);
-		background.getChildren().get(3).setTranslateX(cPosition[0]/m3Distance);
-		
+		List<Node> nodes = background.getChildren();
+		for(int i = 0, s = nodes.size(); i < s; i++)
+		{	nodes.get(i).setTranslateX(cPosition[0]*(double)i/(s+mDistance));
+		}
+				
 		// Platforms
 		platforms.setTranslateY(cPosition[1]);
 		platforms.setTranslateX(cPosition[0]);
