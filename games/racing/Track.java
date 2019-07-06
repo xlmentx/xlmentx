@@ -57,14 +57,13 @@ public class Track
 							pDeclineRates =	{0.0,   0.0,   	0.0}; 
 					
 	private static Group 	background,  midground, foreground, platforms;
-												//i+1	j+1	   original
-	private static double 	mDistance = 0; 	//2400	2400   2400
-							
+	
 	private static Color 	lColor = Color.LIGHTGOLDENRODYELLOW,
 							sColor = Color.DEEPSKYBLUE,
 							fColor = Color.WHITE,
 							mColor = Color.FORESTGREEN,
 							gColor = Color.LIGHTGOLDENRODYELLOW;
+	
 	private static Image 	rocks = new Image("image/scenery/Rocks.png");
 	
 	
@@ -76,18 +75,14 @@ public class Track
 	{	// Background
 		background = new Group();
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
-		for(int i = 0, layers = 3; i < layers; i++)
+		for(double i = 0, layers = 4, j = 1; i < layers; i++, j *= -1)
 		{	double[] dimension = {Resolution[0], Resolution[1]*0.3},
-					 
-			position = {-dimension[0]*i*(i+1)/2.0/layers, 
-			
-					
-					
-					Resolution[1]*(0.1*i+0.5)};
-			double 	 distance = 1-(double)(i+1)/(layers+1+mDistance);
-			background.getChildren().add(newMountain(position, dimension, i+1, distance));
-
-System.out.println("i:"+i+" l:"+layers+" d:"+mDistance+" offset:"+i*(i+1)/2.0/layers);
+		
+					 position = {-dimension[0]*i*j/(layers+1.0), Resolution[1]/2*(1.0/layers*i+1)};
+			double 	peaks = tLength/dimension[0], 
+					distance = 1-(i+1.0)/(layers+1);
+			background.getChildren().add(newMountain(position, dimension, (int)peaks, distance));
+System.out.println("i/L:"+i/layers+" j:"+j+" l:"+layers+" p:"+peaks+" d:"+distance);
 		}	
 		
 		// Platforms
@@ -196,7 +191,7 @@ System.out.println("i:"+i+" l:"+layers+" d:"+mDistance+" offset:"+i*(i+1)/2.0/la
 	{	// Background
 		List<Node> nodes = background.getChildren();
 		for(int i = 0, s = nodes.size(); i < s; i++)
-		{	nodes.get(i).setTranslateX(cPosition[0]*(double)i/(s+mDistance));
+		{	nodes.get(i).setTranslateX(cPosition[0]*(double)i/s);
 		}
 				
 		// Platforms
