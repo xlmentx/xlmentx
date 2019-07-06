@@ -75,14 +75,14 @@ public class Track
 	{	// Background
 		background = new Group();
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
-		for(double i = 0, layers = 4, j = 1; i < layers; i++, j *= -1)
+		for(double i = 0, layers = 4, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
 		{	double[] dimension = {Resolution[0], Resolution[1]*0.3},
 		
-					 position = {-dimension[0]*i*j/(layers+1.0), Resolution[1]/2*(1.0/layers*i+1)};
+					 position = {dimension[0]*j/layers, Resolution[1]/2*(1.0/layers*i+1)};
 			double 	peaks = tLength/dimension[0], 
 					distance = 1-(i+1.0)/(layers+1);
 			background.getChildren().add(newMountain(position, dimension, (int)peaks, distance));
-System.out.println("i/L:"+i/layers+" j:"+j+" l:"+layers+" p:"+peaks+" d:"+distance);
+System.out.println("i:"+i+" j/L:"+j/layers+" l:"+layers+" p:"+peaks+" d:"+distance);
 		}	
 		
 		// Platforms
