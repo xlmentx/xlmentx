@@ -77,13 +77,15 @@ public class Track
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
 		for(double i = 0, layers = 4, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
 		{	double[] dimension = {Resolution[0], Resolution[1]*0.3},
-		
-					 position = {dimension[0]*j/layers, Resolution[1]/2*(1.0/layers*i+1)};
-			double 	peaks = tLength/dimension[0], 
-					distance = 1-(i+1.0)/(layers+1);
-			background.getChildren().add(newMountain(position, dimension, (int)peaks, distance));
-System.out.println("i:"+i+" j/L:"+j/layers+" l:"+layers+" p:"+peaks+" d:"+distance);
-		}	
+					 position = {dimension[0]*j/layers, Resolution[1]/2*(i/layers+1)};
+			
+			double 	distance = 1-(i+1)/(layers+1),
+					peaks = tLength/dimension[0]*(1-distance);
+			
+System.out.println("i:"+i+" x:"+position[0]+" y:"+position[1]+" d:"+distance+" p:"+peaks);
+			
+			background.getChildren().add(newMountain(position, dimension, peaks, distance));
+		}
 		
 		// Platforms
 		platforms = new Group();
@@ -102,7 +104,7 @@ System.out.println("i:"+i+" j/L:"+j/layers+" l:"+layers+" p:"+peaks+" d:"+distan
 	}
 	
 	// Create Mountain
-	private static Polygon newMountain(double[] position, double[] dimension, int peaks, double distance)
+	private static Polygon newMountain(double[] position, double[] dimension, double peaks, double distance)
 	{	double[] 	wRange = {0, dimension[0]*0.08},
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
@@ -122,8 +124,8 @@ System.out.println("i:"+i+" j/L:"+j/layers+" l:"+layers+" p:"+peaks+" d:"+distan
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance)),
-			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance));
+		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance/2)),
+			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance/2));
 		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
 		mountain.setEffect(new DropShadow(127, fColor));
 		
