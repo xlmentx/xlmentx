@@ -124,8 +124,8 @@ System.out.println("i:"+i+" x:"+position[0]+" y:"+position[1]+" d:"+distance+" p
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance/2)),
-			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance/2));
+		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance)),
+			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance));
 		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
 		mountain.setEffect(new DropShadow(127, fColor));
 		
