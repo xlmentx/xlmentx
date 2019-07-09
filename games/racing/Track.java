@@ -57,6 +57,8 @@ public class Track
 							pDeclineRates =	{0.0,   0.0,   	0.0}; 
 					
 	private static Group 	background,  midground, foreground, platforms;
+	private static int		mDistance = 1000;
+			
 	
 	private static Color 	lColor = Color.LIGHTGOLDENRODYELLOW,
 							sColor = Color.DEEPSKYBLUE,
@@ -193,7 +195,7 @@ System.out.println("i:"+i+" x:"+position[0]+" y:"+position[1]+" d:"+distance+" p
 	{	// Background
 		List<Node> nodes = background.getChildren();
 		for(int i = 0, s = nodes.size(); i < s; i++)
-		{	nodes.get(i).setTranslateX(cPosition[0]*(double)i/s);
+		{	nodes.get(i).setTranslateX(cPosition[0]*(double)i*i/s/s);
 		}
 				
 		// Platforms
