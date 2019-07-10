@@ -57,7 +57,6 @@ public class Track
 							pDeclineRates =	{0.0,   0.0,   	0.0}; 
 					
 	private static Group 	background,  midground, foreground, platforms;
-	private static int		mDistance = 1000;
 			
 	
 	private static Color 	lColor = Color.LIGHTGOLDENRODYELLOW,
@@ -77,15 +76,12 @@ public class Track
 	{	// Background
 		background = new Group();
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
-		for(double i = 0, layers = 4, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
-		{	double[] dimension = {Resolution[0], Resolution[1]*0.3},
-					 position = {dimension[0]*j/layers, Resolution[1]/2*(i/layers+1)};
-			
-			double 	distance = 1-(i+1)/(layers+1),
-					peaks = tLength/dimension[0]*(1-distance);
-			
-System.out.println("i:"+i+" x:"+position[0]+" y:"+position[1]+" d:"+distance+" p:"+peaks);
-			
+		for(double i = 0, layers = 5, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
+		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
+					 dimension = {Resolution[0], Resolution[1]*0.3};
+			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(layers+1), 3)+2,
+					 distance = 1-(i+1)/(layers);
+System.out.println("d:"+distance);
 			background.getChildren().add(newMountain(position, dimension, peaks, distance));
 		}
 		
@@ -121,13 +117,14 @@ System.out.println("i:"+i+" x:"+position[0]+" y:"+position[1]+" d:"+distance+" p
 				{	slope /= 3;
 				}
 				mountain.getPoints().addAll(position[0] += width, position[1] += width*slope);
+			//slope/2
 			}
 			mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
 		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance)),
-			 shadow = new Stop(1, blend(Color.BLACK, sColor, distance));
+			 shadow = new Stop(1, Color.BLACK);
 		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
 		mountain.setEffect(new DropShadow(127, fColor));
 		
@@ -195,7 +192,7 @@ System.out.println("i:"+i+" x:"+position[0]+" y:"+position[1]+" d:"+distance+" p
 	{	// Background
 		List<Node> nodes = background.getChildren();
 		for(int i = 0, s = nodes.size(); i < s; i++)
-		{	nodes.get(i).setTranslateX(cPosition[0]*(double)i*i/s/s);
+		{	nodes.get(i).setTranslateX(cPosition[0]*Math.pow((double)i/s, 3));
 		}
 				
 		// Platforms
