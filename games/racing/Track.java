@@ -75,11 +75,11 @@ public class Track
 	{	// Background
 		background = new Group();
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
-		for(double i = 0, mLayers = 4, j = 0; i < mLayers; i++, j += i*Math.pow(-1, i))
-		{	double[] position = {Resolution[0]*(j/mLayers-1),  Resolution[1]/2*(i/mLayers+1)},
+		for(double i = 0, layers = 4, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
+		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
 					 dimension = {Resolution[0], Resolution[1]/3};
-			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(mLayers+1), 3)+2,
-					 distance = 1-(i+1)/(mLayers);
+			double 	 distance = 1-i/layers,
+					 peaks = tLength/dimension[0]*Math.pow(distance, 3) + 2;
 			background.getChildren().add(newMountain(position, dimension, peaks, distance));
 		}
 		
@@ -119,10 +119,13 @@ public class Track
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Stop highlight = new Stop(0, blend(mColor, sColor, distance)),
+System.out.println(distance*0.6);			
+		Stop highlight = new Stop(0, blend(mColor, sColor, distance*0.6)),
 			 shadow = new Stop(1, Color.BLACK);
 		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
-		DropShadow fog = new DropShadow(127, fColor);
+
+System.out.println("	"+127*(1-distance)*0.2);		
+		DropShadow fog = new DropShadow(127, 0, 127*(1-distance)*0.2, fColor);
 		mountain.setEffect(fog);
 		
 		return mountain;
@@ -155,7 +158,6 @@ public class Track
 	    	{	bWriter.setColor(x, y, blend(iReader.getColor(x, y), c, ratio));              
     		}
     	}
-		
 		return new ImagePattern(bImage);
 	}
 	private static Color blend(Color a, Color b, double ratio)
@@ -167,9 +169,6 @@ public class Track
 	}
 	
 	// Random Values
-	private static double random(double value)
-	{	return random(new double[]{0, value});
-	}
 	private static double random(double[] range)
 	{	return random(range, new double[]{1});
 	}
