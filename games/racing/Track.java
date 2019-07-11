@@ -59,11 +59,10 @@ public class Track
 	private static Group 	background,  midground, foreground, platforms;
 			
 	
-	private static Color 	lColor = Color.LIGHTGOLDENRODYELLOW,
-							sColor = Color.DEEPSKYBLUE,
+	private static Color 	sColor = Color.DEEPSKYBLUE,
 							fColor = Color.WHITE,
 							mColor = Color.FORESTGREEN,
-							gColor = Color.LIGHTGOLDENRODYELLOW;
+							gColor = Color.WHEAT;
 	
 	private static Image 	rocks = new Image("image/scenery/Rocks.png");
 	
@@ -76,21 +75,19 @@ public class Track
 	{	// Background
 		background = new Group();
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
-		for(double i = 0, layers = 5, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
-		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
-					 dimension = {Resolution[0], Resolution[1]*0.3};
-			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(layers+1), 3)+2,
-					 distance = 1-(i+1)/(layers);
-System.out.println("d:"+distance);
+		for(double i = 0, mLayers = 4, j = 0; i < mLayers; i++, j += i*Math.pow(-1, i))
+		{	double[] position = {Resolution[0]*(j/mLayers-1),  Resolution[1]/2*(i/mLayers+1)},
+					 dimension = {Resolution[0], Resolution[1]/3};
+			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(mLayers+1), 3)+2,
+					 distance = 1-(i+1)/(mLayers);
 			background.getChildren().add(newMountain(position, dimension, peaks, distance));
 		}
 		
 		// Platforms
 		platforms = new Group();
 		double[] pPosition = {-Resolution[0]/2, Resolution[1]*0.8},
-				 pDimension = {Resolution[0]*2, Resolution[1]};
-		Polygon runWay = newPolygon(pPosition, pDimension, 0);
-		platforms.getChildren().add(runWay);
+				 pDimension = {Resolution[0]*2, Resolution[1]/2};
+		platforms.getChildren().add(newPolygon(pPosition, pDimension, 0));
 		
 		while(pPosition[0] < tLength)
 		{	pPosition[0] += random(xRange, pGapRates, 0);
@@ -117,16 +114,16 @@ System.out.println("d:"+distance);
 				{	slope /= 3;
 				}
 				mountain.getPoints().addAll(position[0] += width, position[1] += width*slope);
-			//slope/2
 			}
 			mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Stop highlight = new Stop(0, blend(mColor.saturate(), sColor, distance)),
+		Stop highlight = new Stop(0, blend(mColor, sColor, distance)),
 			 shadow = new Stop(1, Color.BLACK);
 		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
-		mountain.setEffect(new DropShadow(127, fColor));
+		DropShadow fog = new DropShadow(127, fColor);
+		mountain.setEffect(fog);
 		
 		return mountain;
 	}
@@ -142,7 +139,9 @@ System.out.println("d:"+distance);
 		position[0] += dimension[0];
 		position[1] += dimension[0]*slope;
 		
-		p.setFill(gColor);
+		Stop highlight = new Stop(0, gColor),
+			 shadow = new Stop(1, Color.BLACK);
+		p.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
 		return p;
 	}
 	
@@ -168,6 +167,9 @@ System.out.println("d:"+distance);
 	}
 	
 	// Random Values
+	private static double random(double value)
+	{	return random(new double[]{0, value});
+	}
 	private static double random(double[] range)
 	{	return random(range, new double[]{1});
 	}
