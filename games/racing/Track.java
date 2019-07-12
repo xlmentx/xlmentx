@@ -74,12 +74,16 @@ public class Track
 	static void newTrack(int tLength)
 	{	// Background
 		background = new Group();
-		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sColor));
+		
+		Stop[] sStops = {new Stop(0.5, sColor), new Stop(1, fColor)};
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sStops);
+		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1]*0.6, sFill));
+		
 		for(double i = 0, layers = 4, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
 		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
 					 dimension = {Resolution[0], Resolution[1]/3};
-			double 	 distance = 1-i/layers,
-					 peaks = tLength/dimension[0]*Math.pow(distance, 3) + 2;
+			double 	 distance = 1-(i+1)/(layers+1),
+					 peaks = tLength/dimension[0]*Math.pow(1-distance, 3) +2;
 			background.getChildren().add(newMountain(position, dimension, peaks, distance));
 		}
 		
@@ -119,14 +123,15 @@ public class Track
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-System.out.println(distance*0.6);			
-		Stop highlight = new Stop(0, blend(mColor, sColor, distance*0.6)),
-			 shadow = new Stop(1, Color.BLACK);
-		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
 
-System.out.println("	"+127*(1-distance)*0.2);		
-		DropShadow fog = new DropShadow(127, 0, 127*(1-distance)*0.2, fColor);
-		mountain.setEffect(fog);
+		System.out.println("d:"+(1-distance));		
+		
+		Stop s1 = new Stop(0.5, blend(mColor, sColor, distance*0.5)),
+			 s2 = new Stop(1, fColor);
+		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, s1, s2));
+		
+		DropShadow fog = new DropShadow(127, 0, 127*(1-distance), fColor);
+		//mountain.setEffect(fog);
 		
 		return mountain;
 	}
