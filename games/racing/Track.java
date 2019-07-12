@@ -82,9 +82,8 @@ public class Track
 		for(double i = 0, layers = 4, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
 		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
 					 dimension = {Resolution[0], Resolution[1]/3};
-			double 	 distance = 1-(i+1)/(layers+1),
-					 peaks = tLength/dimension[0]*Math.pow(1-distance, 3) +2;
-			background.getChildren().add(newMountain(position, dimension, peaks, distance));
+			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(layers+1), 3)+2;
+			background.getChildren().add(newMountain(position, dimension, peaks, 1-i/layers));
 		}
 		
 		// Platforms
@@ -115,7 +114,7 @@ public class Track
 			{	double width = random(wRange),
 			   	   	   slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
 				if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
-				{	slope /= 3;
+				{	slope /= 3; 
 				}
 				mountain.getPoints().addAll(position[0] += width, position[1] += width*slope);
 			}
@@ -123,12 +122,19 @@ public class Track
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-		Stop skyFade = new Stop(0.2, blend(mColor, sColor.darker(), distance*0.7)),
-			 fogFade = new Stop(1, blend(mColor, fColor, distance));
-		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, skyFade, fogFade));
+		Color  skyFade = blend(mColor, sColor, distance*0.5),
+			   fog = blend(skyFade, fColor, distance);
+		//0.2-0.5
+		Stop[] stops = { new Stop(0.5, skyFade), new Stop(1, fog)};
+		mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, stops));
+
+		//0.5-1
+		DropShadow dew = new DropShadow(127, 0, 127*(1-distance)*0.5, fColor);
+		mountain.setEffect(dew);
 		
-		DropShadow fog = new DropShadow(127, 0, 127*(1-distance), fColor);
-		//mountain.setEffect(fog);
+		// 0.2,		(0.7-1)
+		
+		//(0.3-0.5), 0.5
 		
 		return mountain;
 	}
