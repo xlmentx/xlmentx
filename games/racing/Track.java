@@ -75,7 +75,7 @@ public class Track
 	{	// Background
 		background = new Group();
 		
-		Stop[] sStops = {new Stop(0.5, sColor), new Stop(1, fColor)};
+		Stop[] sStops = {new Stop(0.3, sColor), new Stop(1, fColor)};
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sStops);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1]*0.6, sFill));
 		
@@ -123,12 +123,9 @@ public class Track
 		}
 		mountain.getPoints().addAll(position[0], Resolution[1]);
 		
-
-		System.out.println("d:"+(1-distance));		
-		
-		Stop s1 = new Stop(0.5, blend(mColor, sColor, distance*0.5)),
-			 s2 = new Stop(1, fColor);
-		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, s1, s2));
+		Stop skyFade = new Stop(0.2, blend(mColor, sColor.darker(), distance*0.7)),
+			 fogFade = new Stop(1, blend(mColor, fColor, distance));
+		mountain.setFill( new LinearGradient(0, 0, 0, 1, true, null, skyFade, fogFade));
 		
 		DropShadow fog = new DropShadow(127, 0, 127*(1-distance), fColor);
 		//mountain.setEffect(fog);
