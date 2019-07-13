@@ -61,7 +61,7 @@ public class Track
 	
 	private static Color 	sColor = Color.DEEPSKYBLUE,
 							fColor = Color.WHITE,
-							mColor = Color.FORESTGREEN,
+							mColor = Color.GREEN,
 							gColor = Color.WHEAT;
 	
 	private static Image 	rocks = new Image("image/scenery/Rocks.png");
@@ -120,21 +120,13 @@ public class Track
 			}
 			mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 		}
-		mountain.getPoints().addAll(position[0], Resolution[1]);
+		// Work on this
+		mountain.getPoints().addAll(position[0], position[1] += (dimension[1]-Resolution[1]*0.6));
 		
 		Color  skyFade = blend(mColor, sColor, distance*0.5),
 			   fog = blend(skyFade, fColor, distance);
-		//0.2-0.5
-		Stop[] stops = { new Stop(0.5, skyFade), new Stop(1, fog)};
+		Stop[] stops = { new Stop(0.3, skyFade), new Stop(0.6, fog)};
 		mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, stops));
-
-		//0.5-1
-		DropShadow dew = new DropShadow(127, 0, 127*(1-distance)*0.5, fColor);
-		mountain.setEffect(dew);
-		
-		// 0.2,		(0.7-1)
-		
-		//(0.3-0.5), 0.5
 		
 		return mountain;
 	}
