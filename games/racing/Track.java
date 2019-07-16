@@ -73,12 +73,25 @@ public class Track
 	// Creates New Track
 	static void newTrack(int tLength)
 	{	// Background
+		double distan = 0,
+			   skyFade = 0.5,
+			   fogFade = 0;
+		
 		background = new Group();
 		
-		Stop[] stops = {new Stop(1, sColor), new Stop(1, fColor)};
+		
+		Stop[] stops = 
+		{	new Stop(0.5, sColor), new Stop(0.5, fColor), 
+			new Stop(0.5, blend(mColor, sColor, (1-1/(distan+1))*skyFade)), new Stop(1, mColor)
+		};
+     
+System.out.println((1-1/(distan+1)));			
+		
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, stops);
-		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1]*0.5, sFill));
-		 
+		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
+		
+		
+		
 		for(double i = 0, layers = 1, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
 		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
 					 dimension = {Resolution[0], Resolution[1]/3};
@@ -87,8 +100,7 @@ public class Track
 			
 			double distance = 1-(i+1)/(layers+1);
 System.out.println("  "+distance);			
-			
-Color  sFade = blend(mColor, sColor, distance*0.5),
+			Color  sFade = blend(mColor, sColor, distance*0.5),
 				   fFade = blend(sFade, fColor, distance*0);
 			Stop[] mStops = { new Stop(distance, sFade), new Stop(1, fFade)};
 			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, mStops));
