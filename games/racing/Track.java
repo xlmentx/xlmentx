@@ -72,42 +72,9 @@ public class Track
 	
 	// Creates New Track
 	static void newTrack(int tLength)
-	{	// Background
-		double distan = 0,
-			   skyFade = 0.5,
-			   fogFade = 0;
-		
-		background = new Group();
-		
-		
-		Stop[] stops = 
-		{	new Stop(0.5, sColor), new Stop(0.5, fColor), 
-			new Stop(0.5, blend(mColor, sColor, (1-1/(distan+1))*skyFade)), new Stop(1, mColor)
-		};
-     
-System.out.println((1-1/(distan+1)));			
-		
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, stops);
-		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
-		
-		
-		
-		for(double i = 0, layers = 1, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
-		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
-					 dimension = {Resolution[0], Resolution[1]/3};
-			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(layers+1), 3)+2;
-			Polygon mountain = newMountain(position, dimension, peaks);
-			
-			double distance = 1-(i+1)/(layers+1);
-System.out.println("  "+distance);			
-			Color  sFade = blend(mColor, sColor, distance*0.5),
-				   fFade = blend(sFade, fColor, distance*0);
-			Stop[] mStops = { new Stop(distance, sFade), new Stop(1, fFade)};
-			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, mStops));
-				
-			background.getChildren().add(mountain);
-		}
-		
+	{	// new Background
+		background = newBackground(tLength);
+	
 		// Platforms
 		platforms = new Group();
 		double[] pPosition = {-Resolution[0]/2, Resolution[1]*0.8},
@@ -122,7 +89,43 @@ System.out.println("  "+distance);
 			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope));
 		}
 	}
-	
+	// Background
+	private static Group newBackground(double tLength)
+	{	Group 	background = new Group();
+		double 	layers = 4,
+				horrizon = 0.5,
+				fade = 0.5,
+				fog = 0;
+		
+		// sky
+		double bDistance = 1-1/(layers+1);
+		Stop s1 = new Stop(horrizon*fog, sColor), 
+			 s2 = new Stop(horrizon, blend(sColor, fColor, fog*(1-0.5)+0.5)),
+			 g1 = new Stop(horrizon, blend(blend(mColor, sColor, bDistance*fade), fColor, bDistance*fog)), 
+			 g2 = new Stop(1, mColor);
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2, g1, g2);
+		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
+		
+		// mountains
+		for(double i = 0, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
+		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]*horrizon*(i/layers+1)},
+					 dimension = {Resolution[0], Resolution[1]/3};
+			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(layers+1), 3)+2;
+			
+			Polygon mountain = newMountain(position, dimension, peaks);
+			
+			double distance = 1-(i+1)/(layers+1);
+			Color  c1 = blend(mColor, sColor, distance*fade),
+				   c2 = blend(c1, fColor, distance*fog);
+			Stop[] mStops = { new Stop(distance, c1), new Stop(1, c1)};
+			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, mStops));
+				
+			background.getChildren().add(mountain);
+		}
+				
+		return background;
+	}
+		
 	// Create Mountain
 	private static Polygon newMountain(double[] position, double[] dimension, double peaks)
 	{	double[] 	wRange = {0, dimension[0]*0.08},
@@ -157,9 +160,7 @@ System.out.println("  "+distance);
 		position[0] += dimension[0];
 		position[1] += dimension[0]*slope;
 		
-		p.setFill(mColor);
-		InnerShadow ground = new InnerShadow(20, 0, 100, gColor);
-		p.setEffect(ground);
+		p.setFill(gColor);
 		return p;
 	}
 	
