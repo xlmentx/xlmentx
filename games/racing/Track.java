@@ -92,7 +92,7 @@ public class Track
 	// Background
 	private static Group newBackground(double tLength)
 	{	Group 	background = new Group();
-		double 	layers = 4,
+		double 	layers = 0,
 				horrizon = 0.5,
 				fade = 0.5,
 				fog = 0;
@@ -101,7 +101,7 @@ public class Track
 		double bDistance = 1-1/(layers+1);
 		Stop s1 = new Stop(horrizon*fog, sColor), 
 			 s2 = new Stop(horrizon, blend(sColor, fColor, fog*(1-0.5)+0.5)),
-			 g1 = new Stop(horrizon, blend(blend(mColor, sColor, bDistance*fade), fColor, bDistance*fog)), 
+			 g1 = new Stop(horrizon, blend(mColor, sColor, bDistance*fade, fColor, bDistance*fog)), 
 			 g2 = new Stop(1, mColor);
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2, g1, g2);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
@@ -115,10 +115,9 @@ public class Track
 			Polygon mountain = newMountain(position, dimension, peaks);
 			
 			double distance = 1-(i+1)/(layers+1);
-			Color  c1 = blend(mColor, sColor, distance*fade),
-				   c2 = blend(c1, fColor, distance*fog);
-			Stop[] mStops = { new Stop(distance, c1), new Stop(1, c1)};
-			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, mStops));
+			Stop skyFade = new Stop(distance, blend(mColor, sColor, distance*fade)),
+				 fogFade = new Stop(1, blend(mColor, sColor, distance*fade, fColor, distance*fog));
+			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, skyFade, fogFade));
 				
 			background.getChildren().add(mountain);
 		}
@@ -164,17 +163,8 @@ public class Track
 		return p;
 	}
 	
-	// Blend Colors
-	private static Paint blend(Image i, Color c, double ratio)
-	{	PixelReader iReader = i.getPixelReader(); 
-		WritableImage bImage = new WritableImage((int)i.getWidth(), (int)i.getHeight()); 
-		PixelWriter bWriter = bImage.getPixelWriter();           
-		for(int x = 0; x < i.getWidth(); x++) 
-    	{	for(int y = 0; y < i.getHeight(); y++) 
-	    	{	bWriter.setColor(x, y, blend(iReader.getColor(x, y), c, ratio));              
-    		}
-    	}
-		return new ImagePattern(bImage);
+	private static Color blend(Color a, Color b, double bRatio, Color c, double cRatio)
+	{	return blend(blend(a, b, bRatio), c, cRatio);
 	}
 	private static Color blend(Color a, Color b, double ratio)
 	{	return Color.rgb
