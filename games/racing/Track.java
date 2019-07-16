@@ -75,15 +75,25 @@ public class Track
 	{	// Background
 		background = new Group();
 		
-		Stop[] sStops = {new Stop(0.3, sColor), new Stop(1, fColor)};
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sStops);
-		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1]*0.6, sFill));
-		
-		for(double i = 0, layers = 4, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
+		Stop[] stops = {new Stop(1, sColor), new Stop(1, fColor)};
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, stops);
+		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1]*0.5, sFill));
+		 
+		for(double i = 0, layers = 1, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
 		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]/2*(i/layers+1)},
 					 dimension = {Resolution[0], Resolution[1]/3};
 			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(layers+1), 3)+2;
-			background.getChildren().add(newMountain(position, dimension, peaks, 1-i/layers));
+			Polygon mountain = newMountain(position, dimension, peaks);
+			
+			double distance = 1-(i+1)/(layers+1);
+System.out.println("  "+distance);			
+			
+			Color  sFade = blend(mColor, sColor, distance*0.5),
+				   fFade = blend(sFade, fColor, distance*0);
+			Stop[] mStops = { new Stop(distance, sFade), new Stop(1, fFade)};
+			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, mStops));
+				
+			background.getChildren().add(mountain);
 		}
 		
 		// Platforms
@@ -102,7 +112,7 @@ public class Track
 	}
 	
 	// Create Mountain
-	private static Polygon newMountain(double[] position, double[] dimension, double peaks, double distance)
+	private static Polygon newMountain(double[] position, double[] dimension, double peaks)
 	{	double[] 	wRange = {0, dimension[0]*0.08},
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
@@ -120,14 +130,7 @@ public class Track
 			}
 			mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 		}
-		// Work on this
-		mountain.getPoints().addAll(position[0], position[1] += (dimension[1]-Resolution[1]*0.6));
-		
-		Color  skyFade = blend(mColor, sColor, distance*0.5),
-			   fog = blend(skyFade, fColor, distance);
-		Stop[] stops = { new Stop(0.3, skyFade), new Stop(0.6, fog)};
-		mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, stops));
-		
+		mountain.getPoints().addAll(position[0], Resolution[1]);
 		return mountain;
 	}
 		
@@ -142,9 +145,9 @@ public class Track
 		position[0] += dimension[0];
 		position[1] += dimension[0]*slope;
 		
-		Stop highlight = new Stop(0, gColor),
-			 shadow = new Stop(1, Color.BLACK);
-		p.setFill( new LinearGradient(0, 0, 0, 1, true, null, highlight, shadow));
+		p.setFill(mColor);
+		InnerShadow ground = new InnerShadow(20, 0, 100, gColor);
+		p.setEffect(ground);
 		return p;
 	}
 	
