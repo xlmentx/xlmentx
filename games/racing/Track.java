@@ -92,10 +92,10 @@ public class Track
 	// Background
 	private static Group newBackground(double tLength)
 	{	Group 	background = new Group();
-		double 	layers = 0,
-				horrizon = 0.5,
+		double 	layers = 2,
+				horrizon = layers > 0? 0.5: 1,
 				fade = 0.5,
-				fog = 0;
+				fog = 1;
 		
 		// sky
 		double bDistance = 1-1/(layers+1);
