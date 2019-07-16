@@ -88,7 +88,7 @@ public class Track
 			double distance = 1-(i+1)/(layers+1);
 System.out.println("  "+distance);			
 			
-			Color  sFade = blend(mColor, sColor, distance*0.5),
+Color  sFade = blend(mColor, sColor, distance*0.5),
 				   fFade = blend(sFade, fColor, distance*0);
 			Stop[] mStops = { new Stop(distance, sFade), new Stop(1, fFade)};
 			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, mStops));
@@ -117,7 +117,7 @@ System.out.println("  "+distance);
 				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
 				 	sRates = {1, 0, 0, 0.8};
 
-		Polygon mountain = new Polygon(position[0], Resolution[1], position[0], position[1]);	
+		Polygon mountain = new Polygon(position[0], position[1]+1, position[0], position[1]);	
 		for(int i = 0; i < peaks; i++) 
     	{	double[] start = position.clone();		
 			while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
@@ -130,7 +130,7 @@ System.out.println("  "+distance);
 			}
 			mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 		}
-		mountain.getPoints().addAll(position[0], Resolution[1]);
+		mountain.getPoints().addAll(position[0], position[1]+1);
 		return mountain;
 	}
 		
