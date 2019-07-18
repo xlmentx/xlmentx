@@ -92,62 +92,67 @@ public class Track
 	// Background
 	private static Group newBackground(double tLength)
 	{	Group 	background = new Group();
-		double 	layers = 2,
+		double 	layers = 4,
 				horrizon = layers > 0? 0.5: 1,
 				fade = 0.5,
 				fog = 1;
 		
 		// sky
-		double bDistance = 1-1/(layers+1);
 		Stop s1 = new Stop(horrizon*fog, sColor), 
-			 s2 = new Stop(horrizon, blend(sColor, fColor, fog*(1-0.5)+0.5)),
-			 g1 = new Stop(horrizon, blend(mColor, sColor, bDistance*fade, fColor, bDistance*fog)), 
-			 g2 = new Stop(1, mColor);
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2, g1, g2);
+			 s2 = new Stop(horrizon, blend(sColor, fColor, (1+fog)*0.5));
+		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.6+0.4));
+		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.7+0.3));
+		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.8+0.2));
+		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*fog));
+		 	//s2 = new Stop(horrizon, blend(sColor, fColor, Math.sqrt(fog)));
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 		
-		// mountains
+		// mountain
 		for(double i = 0, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
-		{	double[] position = {Resolution[0]*(j/layers-1),  Resolution[1]*horrizon*(i/layers+1)},
-					 dimension = {Resolution[0], Resolution[1]/3};
-			double 	 peaks = tLength/dimension[0]*Math.pow((i+1)/(layers+1), 3)+2;
+		{	double[]	position = {Resolution[0]*(j/layers-1),  Resolution[1]*horrizon*(i/layers+1)},
+					 	dimension = {Resolution[0], Resolution[1]/3};
+			Polygon 	mLayer = new Polygon(position[0], Resolution[1], position[0], position[1]);	
 			
-			Polygon mountain = newMountain(position, dimension, peaks);
+			// peaks
+			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
+			{	double[] 	start = position.clone(),
+							sRange = {0, dimension[1]/(dimension[0]*0.4)},
+							sRates = {1, 0, 0, 0.8};
+				while(position[0] < start[0]+dimension[0]*0.8 && position[1] <= start[1])
+				{	double 	width = random(dimension[0]*0.1),
+			   	   			slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
+					if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
+					{	slope /= 3; 
+					}
+					mLayer.getPoints().addAll(position[0] += width, position[1] += width*slope);
+				}
+				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
+			}
+			mLayer.getPoints().addAll(position[0], Resolution[1]);
 			
-			double distance = 1-(i+1)/(layers+1);
-			Stop skyFade = new Stop(distance, blend(mColor, sColor, distance*fade)),
-				 fogFade = new Stop(1, blend(mColor, sColor, distance*fade, fColor, distance*fog));
-			mountain.setFill(new LinearGradient(0, 0, 0, 1, true, null, skyFade, fogFade));
-				
-			background.getChildren().add(mountain);
+			// colors
+			double 	distance = 1-(i+1)/(layers+1),
+					base = dimension[1]/(Resolution[1]-position[1]+dimension[1]);
+			Color	c1 = blend(mColor, sColor, distance*fade),
+					c2 = blend(c1, fColor, distance*fog);
+System.out.println(" d:"+distance+" b:"+base+" f:"+base*distance*fog);
+			// distance: 1, 0.8, 0.6, 0.4, 0.2, 0
+			// fog = 1
+			// goal :	base, base*0.8, base*0.6,..., 0	
+			Stop[] 	colors = 
+			{	new Stop(base*distance*fog, c1), 
+				new Stop(base, c2), 
+				new Stop(1, mColor)
+			};
+			mLayer.setFill(new LinearGradient(0, 0, 0, 1, true, null, colors));
+			background.getChildren().add(mLayer);
 		}
 				
 		return background;
 	}
 		
-	// Create Mountain
-	private static Polygon newMountain(double[] position, double[] dimension, double peaks)
-	{	double[] 	wRange = {0, dimension[0]*0.08},
-				 	sRange = {0, dimension[1]/(dimension[0]*0.4)},
-				 	sRates = {1, 0, 0, 0.8};
-
-		Polygon mountain = new Polygon(position[0], position[1]+1, position[0], position[1]);	
-		for(int i = 0; i < peaks; i++) 
-    	{	double[] start = position.clone();		
-			while(position[0]+wRange[1]*2 < start[0]+dimension[0] && position[1] <= start[1])
-			{	double width = random(wRange),
-			   	   	   slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
-				if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
-				{	slope /= 3; 
-				}
-				mountain.getPoints().addAll(position[0] += width, position[1] += width*slope);
-			}
-			mountain.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
-		}
-		mountain.getPoints().addAll(position[0], position[1]+1);
-		return mountain;
-	}
-		
+	
 	// Create Polygon
 	private static Polygon newPolygon(double[] position, double[] dimension, double slope)
 	{	Polygon p = new Polygon
@@ -163,9 +168,6 @@ public class Track
 		return p;
 	}
 	
-	private static Color blend(Color a, Color b, double bRatio, Color c, double cRatio)
-	{	return blend(blend(a, b, bRatio), c, cRatio);
-	}
 	private static Color blend(Color a, Color b, double ratio)
 	{	return Color.rgb
 		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*ratio)), 
@@ -175,8 +177,8 @@ public class Track
 	}
 	
 	// Random Values
-	private static double random(double[] range)
-	{	return random(range, new double[]{1});
+	private static double random(double range)
+	{	return random(new double[]{0,range}, new double[]{1});
 	}
 	private static double random(double[] range, double[] rates)
 	{	return random(range, rates, range[0]);
