@@ -94,23 +94,17 @@ public class Track
 	{	Group 	background = new Group();
 		double 	layers = 4,
 				horrizon = layers > 0? 0.5: 1,
-				fade = 0.5,
-				fog = 1;
+				fog = 0;
 		
 		// sky
-		Stop s1 = new Stop(horrizon*fog, sColor), 
-			 s2 = new Stop(horrizon, blend(sColor, fColor, (1+fog)*0.5));
-		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.6+0.4));
-		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.7+0.3));
-		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.8+0.2));
-		 	//s2 = new Stop(horrizon, blend(sColor, fColor, fog*fog));
-		 	//s2 = new Stop(horrizon, blend(sColor, fColor, Math.sqrt(fog)));
+		Stop	s1 = new Stop(horrizon*fog, sColor), 
+				s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.2+0.8));
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 		
 		// mountain
 		for(double i = 0, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
-		{	double[]	position = {Resolution[0]*(j/layers-1),  Resolution[1]*horrizon*(i/layers+1)},
+		{	double[]	position = {Resolution[0]*(j/layers-1),  Resolution[1]*(horrizon)*(i/layers+1)},
 					 	dimension = {Resolution[0], Resolution[1]/3};
 			Polygon 	mLayer = new Polygon(position[0], Resolution[1], position[0], position[1]);	
 			
@@ -131,20 +125,32 @@ public class Track
 			}
 			mLayer.getPoints().addAll(position[0], Resolution[1]);
 			
-			// colors
+			
+			// Fog color
+			// distance: 	1, 		0.8, 	0.6, 	0.4, 	0.2, 	0
+			// fog = 1 :	base, 	base*0.8, base*0.6,..., 0	
+			// fog = 0 :	0.5, 	0.37, 	0.25	0.12, 	0	
 			double 	distance = 1-(i+1)/(layers+1),
-					base = dimension[1]/(Resolution[1]-position[1]+dimension[1]);
-			Color	c1 = blend(mColor, sColor, distance*fade),
-					c2 = blend(c1, fColor, distance*fog);
-System.out.println(" d:"+distance+" b:"+base+" f:"+base*distance*fog);
-			// distance: 1, 0.8, 0.6, 0.4, 0.2, 0
-			// fog = 1
-			// goal :	base, base*0.8, base*0.6,..., 0	
+					base = dimension[1]/(Resolution[1]-position[1]+dimension[1]),
+					fHeight = 1-dimension[1]/Resolution[1]/horrizon,					
+					fFactor = 0.5;
+			// COMBINE FHEIGHT AND FFACTOR			
+			Color	c1 = blend(blend(mColor, sColor, distance*0.5), fColor, distance*fFactor),
+					c2 = blend(blend(mColor, sColor, distance*0.5), fColor, distance*fFactor);
+			
+			
+			// Fog height
+			// distance: 	1, 		0.8, 	0.6, 	0.4, 	0.2, 	0
+			// fog = 1 :	bse, 	bse*0.8, bse*0.6, 		0	
+			// fog = 0 :	0.5, 	0.4, 	0.3		0.2, 	0.1,	0	
 			Stop[] 	colors = 
-			{	new Stop(base*distance*fog, c1), 
+			{	//new Stop(base*distance*fog, c1), 
+				new Stop(0, c1), 
 				new Stop(base, c2), 
 				new Stop(1, mColor)
 			};
+System.out.println("mFog h:"+ 0+" c:"+distance*0.5);
+			
 			mLayer.setFill(new LinearGradient(0, 0, 0, 1, true, null, colors));
 			background.getChildren().add(mLayer);
 		}
