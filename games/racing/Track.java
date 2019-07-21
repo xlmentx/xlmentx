@@ -92,8 +92,7 @@ public class Track
 	// Background
 	private static Group newBackground(double tLength)
 	{	Group 	background = new Group();
-		double 	layers = 4,
-				horrizon = layers > 0? 0.5: 1,
+		double 	horrizon = 0.5,
 				fog = 0;
 		
 		// sky
@@ -103,9 +102,11 @@ public class Track
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 		
 		// mountain
-		for(double i = 0, j = 0; i < layers; i++, j += i*Math.pow(-1, i))
-		{	double[]	position = {Resolution[0]*(j/layers-1),  Resolution[1]*(horrizon)*(i/layers+1)},
-					 	dimension = {Resolution[0], Resolution[1]/3};
+		for(double i = 0, layers = 4; i < layers; i++)
+		{	double[]	shift = {(int)(i+1)/2/layers*Math.pow(-1, i)-1, horrizon*(i/layers+1)},//-0.1},
+			position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
+			dimension = {Resolution[0], Resolution[1]/3};
+			
 			Polygon 	mLayer = new Polygon(position[0], Resolution[1], position[0], position[1]);	
 			
 			// peaks
