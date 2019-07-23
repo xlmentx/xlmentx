@@ -73,43 +73,23 @@ public class Track
 	// Creates New Track
 	static void newTrack(int tLength)
 	{	// new Background
-		background = newBackground(tLength);
-	
-		// Platforms
-		platforms = new Group();
-		double[] pPosition = {-Resolution[0]/2, Resolution[1]*0.8},
-				 pDimension = {Resolution[0]*2, Resolution[1]/2};
-		platforms.getChildren().add(newPolygon(pPosition, pDimension, 0));
-		
-		while(pPosition[0] < tLength)
-		{	pPosition[0] += random(xRange, pGapRates, 0);
-			pPosition[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
-			pDimension = new double[] {random(xRange, pWidthRates, xRange[0]), Resolution[0]};
-			double slope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
-			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope));
-		}
-	}
-	// Background
-	private static Group newBackground(double tLength)
-	{	Group 	background = new Group();
+		background = new Group();
 		double 	horrizon = 0.5,
-				fog = 0;
+				fog = 0.5;
 		
 		// sky
-		Stop	s1 = new Stop(horrizon*fog, sColor), 
-				s2 = new Stop(horrizon, blend(sColor, fColor, fog*0.2+0.8));
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2);
-		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
+		Stop[]	sColors = { new Stop(fog, sColor), new Stop(1, fColor)};
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
+		Rectangle sky = new Rectangle(Resolution[0], Resolution[1]*(horrizon+0.1), sFill);
+		background.getChildren().add(sky);
 		
 		// mountain
 		for(double i = 0, layers = 4; i < layers; i++)
-		{	double[]	shift = {(int)(i+1)/2/layers*Math.pow(-1, i)-1, horrizon*(i/layers+1)},//-0.1},
-			position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
-			dimension = {Resolution[0], Resolution[1]/3};
-			
-			Polygon 	mLayer = new Polygon(position[0], Resolution[1], position[0], position[1]);	
-			
-			// peaks
+		{	// Mountain Layer
+			double[] shift = {Math.ceil(i/2)*Math.pow(-1,i)/layers-1, horrizon+(1-horrizon)*i/layers},
+					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
+					 dimension = {Resolution[0], Resolution[1]/3};
+			Polygon	 mLayer = new Polygon(position[0], Resolution[1], position[0], position[1]);	
 			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
 			{	double[] 	start = position.clone(),
 							sRange = {0, dimension[1]/(dimension[0]*0.4)},
@@ -132,12 +112,10 @@ public class Track
 			// fog = 1 :	base, 	base*0.8, base*0.6,..., 0	
 			// fog = 0 :	0.5, 	0.37, 	0.25	0.12, 	0	
 			double 	distance = 1-(i+1)/(layers+1),
-					base = dimension[1]/(Resolution[1]-position[1]+dimension[1]),
-					fHeight = 1-dimension[1]/Resolution[1]/horrizon,					
-					fFactor = 0.5;
+					fFactor = 1;
 			// COMBINE FHEIGHT AND FFACTOR			
-			Color	c1 = blend(blend(mColor, sColor, distance*0.5), fColor, distance*fFactor),
-					c2 = blend(blend(mColor, sColor, distance*0.5), fColor, distance*fFactor);
+			Color	c1 = blend(mColor, sColor, distance*0.5),
+					c2 = blend(c1, fColor, distance*fFactor);
 			
 			
 			// Fog height
@@ -146,19 +124,32 @@ public class Track
 			// fog = 0 :	0.5, 	0.4, 	0.3		0.2, 	0.1,	0	
 			Stop[] 	colors = 
 			{	//new Stop(base*distance*fog, c1), 
-				new Stop(0, c1), 
-				new Stop(base, c2), 
+				new Stop(shift[1]-(horrizon+0.1)*(1-fog)/distance, c1), 
+				new Stop(shift[1], c2), 
 				new Stop(1, mColor)
 			};
-System.out.println("mFog h:"+ 0+" c:"+distance*0.5);
 			
-			mLayer.setFill(new LinearGradient(0, 0, 0, 1, true, null, colors));
+			//test and work on fog
+System.out.println(" h:"+horrizon);			
+			
+			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
 			background.getChildren().add(mLayer);
 		}
-				
-		return background;
-	}
+	
+		// Platforms
+		platforms = new Group();
+		double[] pPosition = {-Resolution[0]/2, Resolution[1]*0.8},
+				 pDimension = {Resolution[0]*2, Resolution[1]/2};
+		platforms.getChildren().add(newPolygon(pPosition, pDimension, 0));
 		
+		while(pPosition[0] < tLength)
+		{	pPosition[0] += random(xRange, pGapRates, 0);
+			pPosition[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
+			pDimension = new double[] {random(xRange, pWidthRates, xRange[0]), Resolution[0]};
+			double slope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
+			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope));
+		}
+	}
 	
 	// Create Polygon
 	private static Polygon newPolygon(double[] position, double[] dimension, double slope)
