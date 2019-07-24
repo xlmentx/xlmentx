@@ -74,7 +74,7 @@ public class Track
 	static void newTrack(int tLength)
 	{	// new Background
 		background = new Group();
-		double 	fog = 1;
+		double 	fog = 0;
 		
 		// sky
 		Stop[]	sColors = { new Stop(fog, sColor), new Stop(1, fColor)};
@@ -106,7 +106,7 @@ public class Track
 			mLayer.getPoints().addAll(position[0], Resolution[1]);
 			
 			
-			// TO DO
+			// TO DO dimension[1]*0.2)
 			// decide on how high the base goes
 			// decide how white fog gets at fog = 1 and = 0
 			// decide how low fog gets at fog = 1 
@@ -115,16 +115,18 @@ public class Track
 			double 	distance = 1-(i+1)/(layers+1);
 			Color	c1 = blend(mColor, sColor, distance*0.5),
 					c2 = blend(c1, fColor, distance*0.5+fog*(1-distance*0.5));
-System.out.println("f0:"+(distance*0.5)+" f1:"+(distance*0.5+1*(1-distance*0.5)));						
 			
 			
 			double 	base1 = shift[1],
 					base2 = shift[1]+0.1*distance,
-					base3 = shift[1]+0.1*(layers-1-i)/(layers-1);
+					base3 = shift[1]+0.1*(layers-1-i)/(layers-1),
+					base4 = shift[1]+0.1*(layers-1-i)/(layers-1);
+System.out.println("f0:"+0.1*distance+" f1:"+0.1*distance*0.5+" f3:"+dimension[1]*0.2/Resolution[1]);						
+			
 			Stop[] 	colors = 
-			{	new Stop(base1-0.6*(1-fog), c1), 
-				new Stop(base1, c2), 
-				new Stop(1, mColor)
+			{	new Stop(base3-0.6*(1-fog), c1), 
+				new Stop(base3, c2), 
+				new Stop(base3, mColor)
 			};
 			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
 									
