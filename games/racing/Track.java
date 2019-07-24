@@ -74,19 +74,18 @@ public class Track
 	static void newTrack(int tLength)
 	{	// new Background
 		background = new Group();
-		double 	horrizon = 0.5,
-				fog = 0.5;
+		double 	fog = 1;
 		
 		// sky
 		Stop[]	sColors = { new Stop(fog, sColor), new Stop(1, fColor)};
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
-		Rectangle sky = new Rectangle(Resolution[0], Resolution[1]*(horrizon+0.1), sFill);
+		Rectangle sky = new Rectangle(Resolution[0], Resolution[1]*0.6, sFill);
 		background.getChildren().add(sky);
 		
 		// mountain
-		for(double i = 0, layers = 4; i < layers; i++)
-		{	// Mountain Layer
-			double[] shift = {Math.ceil(i/2)*Math.pow(-1,i)/layers-1, horrizon+(1-horrizon)*i/layers},
+		for(double i = 0, layers = 4,  j = 1; i < layers; i++, j*=-1)
+		{	// mountain layer
+			double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
 					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
 					 dimension = {Resolution[0], Resolution[1]/3};
 			Polygon	 mLayer = new Polygon(position[0], Resolution[1], position[0], position[1]);	
@@ -107,32 +106,30 @@ public class Track
 			mLayer.getPoints().addAll(position[0], Resolution[1]);
 			
 			
-			// Fog color
-			// distance: 	1, 		0.8, 	0.6, 	0.4, 	0.2, 	0
-			// fog = 1 :	base, 	base*0.8, base*0.6,..., 0	
-			// fog = 0 :	0.5, 	0.37, 	0.25	0.12, 	0	
-			double 	distance = 1-(i+1)/(layers+1),
-					fFactor = 1;
-			// COMBINE FHEIGHT AND FFACTOR			
+			// TO DO
+			// decide on how high the base goes
+			// decide how white fog gets at fog = 1 and = 0
+			// decide how low fog gets at fog = 1 
+			
+			// Static
+			double 	distance = 1-(i+1)/(layers+1);
 			Color	c1 = blend(mColor, sColor, distance*0.5),
-					c2 = blend(c1, fColor, distance*fFactor);
+					c2 = blend(c1, fColor, distance*0.5+fog*(1-distance*0.5));
+System.out.println("f0:"+(distance*0.5)+" f1:"+(distance*0.5+1*(1-distance*0.5)));						
 			
 			
-			// Fog height
-			// distance: 	1, 		0.8, 	0.6, 	0.4, 	0.2, 	0
-			// fog = 1 :	bse, 	bse*0.8, bse*0.6, 		0	
-			// fog = 0 :	0.5, 	0.4, 	0.3		0.2, 	0.1,	0	
+			double 	base1 = shift[1],
+					base2 = shift[1]+0.1*distance,
+					base3 = shift[1]+0.1*(layers-1-i)/(layers-1);
 			Stop[] 	colors = 
-			{	//new Stop(base*distance*fog, c1), 
-				new Stop(shift[1]-(horrizon+0.1)*(1-fog)/distance, c1), 
-				new Stop(shift[1], c2), 
+			{	new Stop(base1-0.6*(1-fog), c1), 
+				new Stop(base1, c2), 
 				new Stop(1, mColor)
 			};
-			
-			//test and work on fog
-System.out.println(" h:"+horrizon);			
-			
 			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
+									
+			
+			
 			background.getChildren().add(mLayer);
 		}
 	
@@ -166,6 +163,9 @@ System.out.println(" h:"+horrizon);
 		return p;
 	}
 	
+	private static Color blend(Color a, Color b, double bRatio, Color c, double cRatio)
+	{	return blend(blend(a, b, bRatio), c, cRatio);
+	}
 	private static Color blend(Color a, Color b, double ratio)
 	{	return Color.rgb
 		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*ratio)), 
