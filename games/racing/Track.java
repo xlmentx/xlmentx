@@ -64,8 +64,6 @@ public class Track
 							mColor = Color.GREEN,
 							gColor = Color.WHEAT;
 	
-	private static Image 	rocks = new Image("image/scenery/Rocks.png");
-	
 	
 	// Private Constructor
 	private Track(){}
@@ -75,58 +73,55 @@ public class Track
 	{	// new Background
 		background = new Group();
 		double 	fog = 0;
-		
-		// sky
 		Stop[]	sColors = { new Stop(fog, sColor), new Stop(1, fColor)};
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		Rectangle sky = new Rectangle(Resolution[0], Resolution[1]*0.6, sFill);
 		background.getChildren().add(sky);
 		
 		// mountain
-		for(double i = 0, layers = 4,  j = 1; i < layers; i++, j*=-1)
-		{	// mountain layer
-			double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
+		for(double i = 0, layers = 4, j = 1; i < layers; i++, j*=-1)
+		{	double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
 					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
 					 dimension = {Resolution[0], Resolution[1]/3};
-			Polygon	 mLayer = new Polygon(position[0], Resolution[1], position[0], position[1]);	
+			
+			// mountain layer
+			Polygon	 mLayer = new Polygon(position[0], Resolution[1]);	
 			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
 			{	double[] 	start = position.clone(),
 							sRange = {0, dimension[1]/(dimension[0]*0.4)},
 							sRates = {1, 0, 0, 0.8};
-				while(position[0] < start[0]+dimension[0]*0.8 && position[1] <= start[1])
-				{	double 	width = random(dimension[0]*0.1),
+				while(position[0] <= start[0]+dimension[0]*0.8 && position[1] <= start[1])
+				{	mLayer.getPoints().addAll(position[0], position[1]);
+					double 	width = random(dimension[0]*0.1),
 			   	   			slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
 					if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
 					{	slope /= 3; 
 					}
-					mLayer.getPoints().addAll(position[0] += width, position[1] += width*slope);
+					position = new double[]{position[0]+width, position[1]+width*slope};
 				}
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}
 			mLayer.getPoints().addAll(position[0], Resolution[1]);
 			
-			
 			// TO DO dimension[1]*0.2)
 			// decide on how high the base goes
 			// decide how white fog gets at fog = 1 and = 0
-			// decide how low fog gets at fog = 1 
+			// decide how low fog gets at fog = 1 and = 0
 			
 			// Static
 			double 	distance = 1-(i+1)/(layers+1);
 			Color	c1 = blend(mColor, sColor, distance*0.5),
 					c2 = blend(c1, fColor, distance*0.5+fog*(1-distance*0.5));
 			
-			
+			//dimension[1]/Resolution[1]*0.2
 			double 	base1 = shift[1],
-					base2 = shift[1]+0.1*distance,
-					base3 = shift[1]+0.1*(layers-1-i)/(layers-1),
+					base2 = shift[1]+0.05,
 					base4 = shift[1]+0.1*(layers-1-i)/(layers-1);
-System.out.println("f0:"+0.1*distance+" f1:"+0.1*distance*0.5+" f3:"+dimension[1]*0.2/Resolution[1]);						
 			
 			Stop[] 	colors = 
-			{	new Stop(base3-0.6*(1-fog), c1), 
-				new Stop(base3, c2), 
-				new Stop(base3, mColor)
+			{	new Stop(base1-0.6*(1-fog), c1), 
+				new Stop(base1, c2),
+				new Stop(1, mColor)
 			};
 			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
 									
