@@ -73,9 +73,9 @@ public class Track
 	{	// new Background
 		background = new Group();
 		double 	fog = 0;
-		Stop[]	sColors = { new Stop(fog, sColor), new Stop(1, fColor)};
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
-		Rectangle sky = new Rectangle(Resolution[0], Resolution[1]*0.6, sFill);
+		Stop[]	bColors = { new Stop(fog, sColor), new Stop(1, fColor)};
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, bColors);
+		Rectangle sky = new Rectangle(Resolution[0], Resolution[1]*0.5, sFill);
 		background.getChildren().add(sky);
 		
 		// mountain
@@ -83,14 +83,15 @@ public class Track
 		{	double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
 					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
 					 dimension = {Resolution[0], Resolution[1]/3};
-			
+			double 	 distance = 1-(i+1)/(layers+1);
+				
 			// mountain layer
-			Polygon	 mLayer = new Polygon(position[0], Resolution[1]);	
-			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
+			Polygon	 mLayer = new Polygon(position[0], position[1]+0.5/layers*Resolution[1]);	
+			while(position[0]-Resolution[0] <= tLength*Math.pow(1-distance, 3)) 
 			{	double[] 	start = position.clone(),
 							sRange = {0, dimension[1]/(dimension[0]*0.4)},
 							sRates = {1, 0, 0, 0.8};
-				while(position[0] <= start[0]+dimension[0]*0.8 && position[1] <= start[1])
+				while(position[0] <= start[0]+dimension[0]*0.9 && position[1] <= start[1])
 				{	mLayer.getPoints().addAll(position[0], position[1]);
 					double 	width = random(dimension[0]*0.1),
 			   	   			slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
@@ -101,28 +102,23 @@ public class Track
 				}
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}
-			mLayer.getPoints().addAll(position[0], Resolution[1]);
+			mLayer.getPoints().addAll(position[0], position[1]+0.5/layers*Resolution[1]);
 			
 			// TO DO dimension[1]*0.2)
-			// decide on how high the base goes
-			// decide how white fog gets at fog = 1 and = 0
-			// decide how low fog gets at fog = 1 and = 0
-			
+			// decide how white fog gets at fog = 1(>0.4) and = 0(<0.4)
+				
 			// Static
-			double 	distance = 1-(i+1)/(layers+1);
-			Color	c1 = blend(mColor, sColor, distance*0.5),
-					c2 = blend(c1, fColor, distance*0.5+fog*(1-distance*0.5));
 			
-			//dimension[1]/Resolution[1]*0.2
-			double 	base1 = shift[1],
-					base2 = shift[1]+0.05,
-					base4 = shift[1]+0.1*(layers-1-i)/(layers-1);
-			
+			Color	sumit = blend(mColor, Color.BLACK, distance*0.5, sColor, distance*0.5),
+					base = blend(sumit, fColor, distance*0.25),
+					valley = blend(mColor, sColor, distance*0.5);
+					
 			Stop[] 	colors = 
-			{	new Stop(base1-0.6*(1-fog), c1), 
-				new Stop(base1, c2),
-				new Stop(1, mColor)
+			{	new Stop(shift[1]-0.5*(1-fog), sumit), 
+				new Stop(shift[1], base),
+				new Stop(shift[1], valley)
 			};
+			
 			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
 									
 			
