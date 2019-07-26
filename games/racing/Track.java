@@ -72,22 +72,25 @@ public class Track
 	static void newTrack(int tLength)
 	{	// new Background
 		background = new Group();
-		double 	fog = 0;
-		Stop[]	bColors = { new Stop(fog, sColor), new Stop(1, fColor)};
+		double 	fog = 1;
+		Stop[]	bColors = 
+		{	new Stop(0.5*fog, sColor), new Stop(0.5, fColor),
+			new Stop(0.5, blend(blend(blend(mColor, Color.BLACK, 0.3), sColor, 0.3), fColor, 1)), 
+			new Stop(1, blend(mColor, fColor, 0.5))
+		};
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, bColors);
-		Rectangle sky = new Rectangle(Resolution[0], Resolution[1]*0.5, sFill);
+		Rectangle sky = new Rectangle(Resolution[0], Resolution[1], sFill);
 		background.getChildren().add(sky);
 		
 		// mountain
-		for(double i = 0, layers = 4, j = 1; i < layers; i++, j*=-1)
+		for(double i = 0, layers = 3, j = 1; i < layers; i++, j*=-1)
 		{	double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
 					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
 					 dimension = {Resolution[0], Resolution[1]/3};
-			double 	 distance = 1-(i+1)/(layers+1);
 				
 			// mountain layer
-			Polygon	 mLayer = new Polygon(position[0], position[1]+0.5/layers*Resolution[1]);	
-			while(position[0]-Resolution[0] <= tLength*Math.pow(1-distance, 3)) 
+			Polygon	 mLayer = new Polygon();	
+			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
 			{	double[] 	start = position.clone(),
 							sRange = {0, dimension[1]/(dimension[0]*0.4)},
 							sRates = {1, 0, 0, 0.8};
@@ -102,27 +105,22 @@ public class Track
 				}
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}
-			mLayer.getPoints().addAll(position[0], position[1]+0.5/layers*Resolution[1]);
 			
-			// TO DO dimension[1]*0.2)
-			// decide how white fog gets at fog = 1(>0.4) and = 0(<0.4)
+			// TO DO
+			// fog = 0, g:(B,0.3,S,0.3,F,0.3) m:(B,0.4,S,0.3,F,0.3)
+			// fog = 1, g:(B,0.3,S,0.3,F,1) g2:(F,0.5) m:(B,0.4,S,0.3,F,1)
 				
 			// Static
-			
-			Color	sumit = blend(mColor, Color.BLACK, distance*0.5, sColor, distance*0.5),
-					base = blend(sumit, fColor, distance*0.25),
-					valley = blend(mColor, sColor, distance*0.5);
+			double 	distance = 1-i/layers;
+			Color	sumit = blend(blend(mColor, Color.BLACK, distance*0.4), sColor, distance*0.3),
+					base = blend(sumit, fColor, distance*0.3);
 					
 			Stop[] 	colors = 
 			{	new Stop(shift[1]-0.5*(1-fog), sumit), 
-				new Stop(shift[1], base),
-				new Stop(shift[1], valley)
+				new Stop(shift[1], base)
 			};
 			
 			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
-									
-			
-			
 			background.getChildren().add(mLayer);
 		}
 	
@@ -156,8 +154,8 @@ public class Track
 		return p;
 	}
 	
-	private static Color blend(Color a, Color b, double bRatio, Color c, double cRatio)
-	{	return blend(blend(a, b, bRatio), c, cRatio);
+	private static Color blend(Color a, Color b, double bR, Color c, double cR)
+	{	return blend(blend(a, b, bR), c, cR);
 	}
 	private static Color blend(Color a, Color b, double ratio)
 	{	return Color.rgb
