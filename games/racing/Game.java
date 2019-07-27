@@ -50,7 +50,7 @@ public class Game extends Application
 		// Camera
 		Physics	 subject = player.get(0);
 		double[] sDomain = {Resolution[0]*0.2,Resolution[0]*0.5},
-				 sRange = {Resolution[1]*0.4,Resolution[1]*0.8};
+				 sRange = {Resolution[1]*0.2,Resolution[1]*0.8};
 		Camera   camera = new Camera(subject, sDomain, sRange);
 		
 		// Game Pane 62 FPS

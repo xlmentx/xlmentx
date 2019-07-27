@@ -70,27 +70,27 @@ public class Track
 	
 	// Creates New Track
 	static void newTrack(int tLength)
-	{	// new Background
+	{	
+		// new Background
 		background = new Group();
-		double 	fog = 1;
-		Stop[]	bColors = 
-		{	new Stop(0.5*fog, sColor), new Stop(0.5, fColor),
-			new Stop(0.5, blend(blend(blend(mColor, Color.BLACK, 0.3), sColor, 0.3), fColor, 1)), 
-			new Stop(1, blend(mColor, fColor, 0.5))
-		};
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, bColors);
-		Rectangle sky = new Rectangle(Resolution[0], Resolution[1], sFill);
-		background.getChildren().add(sky);
+		double 	fHeight = 0;
+		Stop	s1 = new Stop(0.5*fHeight, sColor), 
+				s2 = new Stop(0.5, fColor),
+				g1 = new Stop(0.5, blend(blend(mColor, sColor, 0.3), fColor, 0.2)), 
+				g2 = new Stop(1, blend(mColor, fColor, 0));
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2, g1, g2);
+		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 		
 		// mountain
-		for(double i = 0, layers = 3, j = 1; i < layers; i++, j*=-1)
-		{	double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
+		for(double i = 0, layers = 1, j = 1; i < layers; i++, j*=-1)
+		{	
+			// mountain layer
+			double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
 					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
 					 dimension = {Resolution[0], Resolution[1]/3};
-				
-			// mountain layer
 			Polygon	 mLayer = new Polygon();	
-			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
+System.out.println(0.2+0.8*i/layers);		
+			while(position[0]-Resolution[0] <= tLength*Math.pow(0.2+0.8*i/layers, 3)) 
 			{	double[] 	start = position.clone(),
 							sRange = {0, dimension[1]/(dimension[0]*0.4)},
 							sRates = {1, 0, 0, 0.8};
@@ -104,19 +104,18 @@ public class Track
 					position = new double[]{position[0]+width, position[1]+width*slope};
 				}
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
-			}
-			
+			}	
 			// TO DO
-			// fog = 0, g:(B,0.3,S,0.3,F,0.3) m:(B,0.4,S,0.3,F,0.3)
-			// fog = 1, g:(B,0.3,S,0.3,F,1) g2:(F,0.5) m:(B,0.4,S,0.3,F,1)
+			// fog = 0, g:(B,0.2, S,0.3, F,0.3) g2:(F,0)	m:(B,0.3, S,0.3, F,0.3)
+			// fog = 1, g:(B,0.2, S,0.3, F,1) 	g2:(F,0.5) 	m:(B,0.3, S,0.3, F,1)
 				
 			// Static
 			double 	distance = 1-i/layers;
-			Color	sumit = blend(blend(mColor, Color.BLACK, distance*0.4), sColor, distance*0.3),
-					base = blend(sumit, fColor, distance*0.3);
+			Color	sumit = blend(blend(mColor, Color.BLACK, distance*0.2), sColor, distance*0.3),
+					base = blend(sumit, fColor, distance*0.2);
 					
 			Stop[] 	colors = 
-			{	new Stop(shift[1]-0.5*(1-fog), sumit), 
+			{	new Stop(shift[1]-0.5*(1-fHeight), sumit), 
 				new Stop(shift[1], base)
 			};
 			
@@ -189,8 +188,8 @@ public class Track
 	static void translate(double[] cPosition) 
 	{	// Background
 		List<Node> nodes = background.getChildren();
-		for(int i = 0, s = nodes.size(); i < s; i++)
-		{	nodes.get(i).setTranslateX(cPosition[0]*Math.pow((double)i/s, 3));
+		for(int i = 1, s = nodes.size(); i < s; i++)
+		{	nodes.get(i).setTranslateX(cPosition[0]*Math.pow(0.2+0.8*(double)(i-1)/s, 3));
 		}
 				
 		// Platforms
