@@ -72,29 +72,34 @@ public class Track
 	static void newTrack(int tLength)
 	{	
 		// new Background
-		background = new Group();
-		double 	fHeight = 0;
-		Stop	s1 = new Stop(0.5*fHeight, sColor), 
-				s2 = new Stop(0.5, fColor),
-				g1 = new Stop(0.5, blend(blend(mColor, sColor, 0.5), fColor, 0.2)), 
-				g2 = new Stop(1, blend(mColor, fColor, 0));
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, s1, s2, g1, g2);
+		background = new Group();	
+		double 	sFade = 0.5	+0.0, 	// 0.1	
+				fFade = 0.0,		
+				bFade = 0.2	+0.1,	// 0.1	
+				fog = 0.5;					
+		Stop[]	sColors = 
+		{	new Stop(0.5*fog, sColor), 
+			new Stop(0.5, fColor),
+			new Stop(0.5, blend(blend(mColor, sColor, sFade), fColor, fFade)), 
+			new Stop(0.6, blend(blend(mColor, sColor, sFade/2), fColor, fFade/2)), 
+			new Stop(1, mColor)
+		};
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 		
-		// mountain
+		// mountain 
 		for(double i = 0, layers = 4, j = 1; i < layers; i++, j*=-1)
 		{	
-			// mountain layer
-			double[] shift = {(int)(i+1)/2*j/layers-1, 0.5*(1+i/layers)},
+			// mountain layer							
+			double[] shift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow(i/layers, 2))},
 					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
 					 dimension = {Resolution[0], Resolution[1]/3};
 			Polygon	 mLayer = new Polygon();	
-System.out.println(0.2+0.8*i/layers);		
 			while(position[0]-Resolution[0] <= tLength*Math.pow(0.2+0.8*i/layers, 3)) 
 			{	double[] 	start = position.clone(),
 							sRange = {0, dimension[1]/(dimension[0]*0.4)},
 							sRates = {1, 0, 0, 0.8};
-				while(position[0] <= start[0]+dimension[0]*0.9 && position[1] <= start[1])
+				while(position[0] <= start[0]+dimension[0]*0.8 && position[1] <= start[1])
 				{	mLayer.getPoints().addAll(position[0], position[1]);
 					double 	width = random(dimension[0]*0.1),
 			   	   			slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
@@ -108,18 +113,13 @@ System.out.println(0.2+0.8*i/layers);
 			// TO DO
 			// fog = 0, g:(B,0.2, S,0.3, F,0.3) g2:(F,0)	m:(B,0.3, S,0.3, F,0.3)
 			// fog = 1, g:(B,0.2, S,0.3, F,1) 	g2:(F,0.5) 	m:(B,0.3, S,0.3, F,1)
-			
-			//		 	0		0.25	0.5		0.75	1				
-			// black = 1
-			// blue = 2
-			// white = 1
-			// Static
 			double 	distance = 1-i/layers;
-			Color	sumit = blend(blend(mColor, Color.BLACK, distance*0.2), sColor, distance*0.5),
-					base = blend(sumit, fColor, distance*0.2);
+			Color	sumit = blend(blend(mColor, Color.BLACK, bFade*distance), sColor, sFade*distance),
+					base = blend(sumit, fColor, fFade*distance);
+System.out.println("y:"+shift[1]+" z:"+distance);
 					
 			Stop[] 	colors = 
-			{	new Stop(shift[1]-0.5*(1-fHeight), sumit), 
+			{	new Stop(shift[1]-0.5*(1-fog), sumit), 
 				new Stop(shift[1], base)
 			};
 			
