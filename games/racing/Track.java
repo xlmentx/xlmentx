@@ -73,10 +73,10 @@ public class Track
 	{	
 		// new Background
 		background = new Group();	
-		double 	sFade = 0.5	+0.0, 	// 0.1	
-				fFade = 0.0,		
-				bFade = 0.2	+0.1,	// 0.1	
-				fog = 0.5;					
+		double 	sFade = 0.5	+0.0, 	// 0.1	0.2	0.3	0.4
+				fFade = 0.2,		
+				bFade = 0.3	+0.0,	// 0.1	0.1	0.1	0.2
+				fog = 1;					
 		Stop[]	sColors = 
 		{	new Stop(0.5*fog, sColor), 
 			new Stop(0.5, fColor),
@@ -114,7 +114,8 @@ public class Track
 			// fog = 0, g:(B,0.2, S,0.3, F,0.3) g2:(F,0)	m:(B,0.3, S,0.3, F,0.3)
 			// fog = 1, g:(B,0.2, S,0.3, F,1) 	g2:(F,0.5) 	m:(B,0.3, S,0.3, F,1)
 			double 	distance = 1-i/layers;
-			Color	sumit = blend(blend(mColor, Color.BLACK, bFade*distance), sColor, sFade*distance),
+			Color	fade = blend(sColor, Color.BLACK, bFade*distance),
+					sumit = blend(mColor, fade, sFade*distance),
 					base = blend(sumit, fColor, fFade*distance);
 System.out.println("y:"+shift[1]+" z:"+distance);
 					
