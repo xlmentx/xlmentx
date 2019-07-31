@@ -73,18 +73,16 @@ public class Track
 	{	
 		// new Background
 		background = new Group();	
-		double 	sFade = 0.5	+0.0, 	// 0.1	0.2	0.3	0.4
-				fFade = 0.2,		
-				bFade = 0.3	+0.0,	// 0.1	0.1	0.1	0.2
-				fog = 1;					
+		double 	fog = 0.5;					
 		Stop[]	sColors = 
 		{	new Stop(0.5*fog, sColor), 
 			new Stop(0.5, fColor),
-			new Stop(0.5, blend(blend(mColor, sColor, sFade), fColor, fFade)), 
-			new Stop(0.6, blend(blend(mColor, sColor, sFade/2), fColor, fFade/2)), 
-			new Stop(1, mColor)
+			new Stop(0.5, blend(mColor, fColor, 0.5*(1+fog))),
+			new Stop(0.6, blend(mColor, fColor, 0.25+0.75*fog)), 
+			new Stop(1, blend(mColor, fColor, fog))
 		};
-		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
+		
+				LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 		
 		// mountain 
@@ -110,15 +108,19 @@ public class Track
 				}
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}	
-			// TO DO
-			// fog = 0, g:(B,0.2, S,0.3, F,0.3) g2:(F,0)	m:(B,0.3, S,0.3, F,0.3)
-			// fog = 1, g:(B,0.2, S,0.3, F,1) 	g2:(F,0.5) 	m:(B,0.3, S,0.3, F,1)
-			double 	distance = 1-i/layers;
-			Color	fade = blend(sColor, Color.BLACK, bFade*distance),
-					sumit = blend(mColor, fade, sFade*distance),
-					base = blend(sumit, fColor, fFade*distance);
-System.out.println("y:"+shift[1]+" z:"+distance);
-					
+
+			double 	distance = (1-i/layers);
+			
+			/*			
+				@0: 	0.5		0.375	0.25	0.125	0
+				@0.5:	0.75	0.6875	0.625	0.5625	0.5
+				@1: 	1		1		1		1		1
+			*/			
+			Color	sumit = blend(blend(mColor, Color.BLACK, distance*0.3), sColor, 0.5*distance),
+					base = blend(blend(mColor, Color.BLACK, distance*0.3), fColor, 0.5*distance*(1-fog)+fog);
+			
+System.out.println("fog:"+(		0.5*distance*(1-fog)+fog		));
+
 			Stop[] 	colors = 
 			{	new Stop(shift[1]-0.5*(1-fog), sumit), 
 				new Stop(shift[1], base)
@@ -158,9 +160,6 @@ System.out.println("y:"+shift[1]+" z:"+distance);
 		return p;
 	}
 	
-	private static Color blend(Color a, Color b, double bR, Color c, double cR)
-	{	return blend(blend(a, b, bR), c, cR);
-	}
 	private static Color blend(Color a, Color b, double ratio)
 	{	return Color.rgb
 		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*ratio)), 
