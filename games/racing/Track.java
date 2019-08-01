@@ -73,20 +73,22 @@ public class Track
 	{	
 		// new Background
 		background = new Group();	
-		double 	fog = 0.5;					
+		double 	fog = 0.5,
+				haze = 0.2;					
 		Stop[]	sColors = 
 		{	new Stop(0.5*fog, sColor), 
 			new Stop(0.5, fColor),
-			new Stop(0.5, blend(mColor, fColor, 0.5*(1+fog))),
-			new Stop(0.6, blend(mColor, fColor, 0.25+0.75*fog)), 
-			new Stop(1, blend(mColor, fColor, fog))
+			new Stop(0.5, blend(blend(mColor, 	sColor, 0.5*3/3), 	fColor, haze*3/3)),
+			new Stop(0.55, blend(blend(mColor, 	sColor, 0.5*2/3), 	fColor, haze*2/3)), 
+			new Stop(0.69, blend(blend(mColor, 	sColor, 0.5*1/3), 	fColor, haze*1/3)), 
+			new Stop(1, mColor)
 		};
-		
-				LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
+
+		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 		
 		// mountain 
-		for(double i = 0, layers = 4, j = 1; i < layers; i++, j*=-1)
+		for(double i = 0, layers = 3, j = 1; i < layers; i++, j*=-1)
 		{	
 			// mountain layer							
 			double[] shift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow(i/layers, 2))},
@@ -111,18 +113,11 @@ public class Track
 
 			double 	distance = (1-i/layers);
 			
-			/*			
-				@0: 	0.5		0.375	0.25	0.125	0
-				@0.5:	0.75	0.6875	0.625	0.5625	0.5
-				@1: 	1		1		1		1		1
-			*/			
-			Color	sumit = blend(blend(mColor, Color.BLACK, distance*0.3), sColor, 0.5*distance),
-					base = blend(blend(mColor, Color.BLACK, distance*0.3), fColor, 0.5*distance*(1-fog)+fog);
+			Color	summit = blend(blend(mColor, Color.BLACK, distance*0.3), sColor, distance*0.5),
+					base = blend(summit, fColor, haze*distance);
 			
-System.out.println("fog:"+(		0.5*distance*(1-fog)+fog		));
-
 			Stop[] 	colors = 
-			{	new Stop(shift[1]-0.5*(1-fog), sumit), 
+			{	new Stop(shift[1]-0.5*(1-fog), summit), 
 				new Stop(shift[1], base)
 			};
 			
