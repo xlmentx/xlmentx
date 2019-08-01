@@ -70,32 +70,33 @@ public class Track
 	
 	// Creates New Track
 	static void newTrack(int tLength)
-	{	
+	{	//	even:	z), z) 							< fade:	z), z*z)						<< fade:	z), z*z*z)					
+		//	< fog:	z*z), z)						< fade:	z*z), z*z)						<< fade:	z*z), z*z*z)			
+		//	<< fog:	z*z*z), z)						< fade:	z*z*z), z*z)					<< fade:	z*z*z), z*z*z)
+		//	< blue:	Math.sqrt(z)), z)				< fade:	Math.sqrt(z)), z*z)				<< fade:	Math.sqrt(z)), z*z*z)		
+		//	<< blue:Math.sqrt(Math.sqrt(z))), z)	< fade:	Math.sqrt(Math.sqrt(z))), z*z)	<< fade:	Math.sqrt(Math.sqrt(z))), z*z*z)
 		// new Background
 		background = new Group();	
-		double 	fog = 0.5,
-				haze = 0.2;					
-		Stop[]	sColors = 
-		{	new Stop(0.5*fog, sColor), 
-			new Stop(0.5, fColor),
-			new Stop(0.5, blend(blend(mColor, 	sColor, 0.5*3/3), 	fColor, haze*3/3)),
-			new Stop(0.55, blend(blend(mColor, 	sColor, 0.5*2/3), 	fColor, haze*2/3)), 
-			new Stop(0.69, blend(blend(mColor, 	sColor, 0.5*1/3), 	fColor, haze*1/3)), 
-			new Stop(1, mColor)
-		};
-
+		double 	fog = 0.5;					
+		Stop[]	sColors = new Stop[10]; 
+		sColors[0] = new Stop(0.5*fog, sColor);
+		for(int i = 0; i < sColors.length-1; i++)
+		{	double 	z = 1-i/(sColors.length-2.0),
+					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
+			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, z), z*z*z));			
+		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
-		
+
 		// mountain 
-		for(double i = 0, layers = 3, j = 1; i < layers; i++, j*=-1)
+		for(double i = 0, layers = 6, j = 1; i < layers; i++, j*=-1)
 		{	
 			// mountain layer							
-			double[] shift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow(i/layers, 2))},
+			double[] shift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow((i+1)/(layers+1), 2))},
 					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
 					 dimension = {Resolution[0], Resolution[1]/3};
 			Polygon	 mLayer = new Polygon();	
-			while(position[0]-Resolution[0] <= tLength*Math.pow(0.2+0.8*i/layers, 3)) 
+			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
 			{	double[] 	start = position.clone(),
 							sRange = {0, dimension[1]/(dimension[0]*0.4)},
 							sRates = {1, 0, 0, 0.8};
@@ -111,10 +112,10 @@ public class Track
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}	
 
-			double 	distance = (1-i/layers);
-			
-			Color	summit = blend(blend(mColor, Color.BLACK, distance*0.3), sColor, distance*0.5),
-					base = blend(summit, fColor, haze*distance);
+			double 	z = (1-(i+1)/(layers+1));
+					
+			Color	summit = blend(blend(mColor, Color.BLACK, z*z), sColor, z),
+					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, z), z*z*z);
 			
 			Stop[] 	colors = 
 			{	new Stop(shift[1]-0.5*(1-fog), summit), 
@@ -151,7 +152,16 @@ public class Track
 		position[0] += dimension[0];
 		position[1] += dimension[0]*slope;
 		
-		p.setFill(gColor);
+		Stop[] 	colors = 
+		{	new Stop(0.78, gColor.darker()), 
+			new Stop(0.82, gColor), 
+			
+			new Stop(0.925, gColor), 
+			new Stop(0.93, gColor.darker()),
+			new Stop(1, gColor.darker().darker()),
+		};
+			
+		p.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
 		return p;
 	}
 	
@@ -187,8 +197,8 @@ public class Track
 	static void translate(double[] cPosition) 
 	{	// Background
 		List<Node> nodes = background.getChildren();
-		for(int i = 1, s = nodes.size(); i < s; i++)
-		{	nodes.get(i).setTranslateX(cPosition[0]*Math.pow(0.2+0.8*(double)(i-1)/s, 3));
+		for(double i = 1, layers = nodes.size(); i < layers; i++)
+		{	nodes.get((int)i).setTranslateX(cPosition[0]*Math.pow(i/layers, 3));
 		}
 				
 		// Platforms
