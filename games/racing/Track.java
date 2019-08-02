@@ -70,22 +70,12 @@ public class Track
 	
 	// Creates New Track
 	static void newTrack(int tLength)
-	{	// BLACK:	z
-			//	WHITE						Fade
-			//	1	 						z, z*z 
-			//	z 							z, z*z , Math.sqrt(z),
-			//	z*z							z, z*z , Math.sqrt(z), 
-			//	Math.sqrt(z)				z, z*z 
-			//	4*Math.pow(z-0.5,3)+0.5		z, z*z
-		
-		
-		// 	BLACK:	z*z
-		//	WHITE:						Fade:
-		//	1	 						z, z*z
-		//	z 							z, z*z 
-		//	z*z							z, z*z , Math.sqrt(z), 4*Math.pow(z-0.5,3)+0.5
-		//	Math.sqrt(z)				z, z*z , Math.sqrt(z), 4*Math.pow(z-0.5,3)+0.5
-		//	4*Math.pow(z-0.5,3)+0.5		z, z*z , Math.sqrt(z), 4*Math.pow(z-0.5,3)+0.5
+	{	// BEST Colors:		summit = blend(blend(mColor, Color.BLACK, z), sColor, z),
+		//					base = blend(blend(mColor, Color.BLACK, z), blend(sColor, fColor, 4*Math.pow(z-0.5,3)+0.5), z*z);
+		// BEST FADE:		summit = blend(blend(mColor, Color.BLACK, z*z), sColor, z),
+		//					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, z), z);
+			
+// Idea: mColor First then Fog(after best, then Compare)		
 		
 		// new Background
 		background = new Group();	
@@ -95,8 +85,7 @@ public class Track
 		for(int i = 0; i < sColors.length-1; i++)
 		{	double 	z = 1-i/(sColors.length-2.0),
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
-			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 		z*z), 4*Math.pow(z-0.5,3)+0.5
-					));			
+			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, Math.sqrt(z)), z));			
 		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
@@ -127,8 +116,7 @@ public class Track
 
 			double 	z = (1-(i+1)/(layers+1));
 			Color	summit = blend(blend(mColor, Color.BLACK, z*z), sColor, z),
-					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 					z*z),  4*Math.pow(z-0.5,3)+0.5
-							);
+					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, Math.sqrt(z)), z);
 			Stop[] 	colors = 
 			{	new Stop(shift[1]-0.5*(1-fog), summit), 
 				new Stop(shift[1], base)
