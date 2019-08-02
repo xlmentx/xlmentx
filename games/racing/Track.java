@@ -70,26 +70,26 @@ public class Track
 	
 	// Creates New Track
 	static void newTrack(int tLength)
-	{	//	even:	z), z) 							< fade:	z), z*z)						<< fade:	z), z*z*z)					
-		//	< fog:	z*z), z)						< fade:	z*z), z*z)						<< fade:	z*z), z*z*z)			
-		//	<< fog:	z*z*z), z)						< fade:	z*z*z), z*z)					<< fade:	z*z*z), z*z*z)
-		//	< blue:	Math.sqrt(z)), z)				< fade:	Math.sqrt(z)), z*z)				<< fade:	Math.sqrt(z)), z*z*z)		
-		//	<< blue:Math.sqrt(Math.sqrt(z))), z)	< fade:	Math.sqrt(Math.sqrt(z))), z*z)	<< fade:	Math.sqrt(Math.sqrt(z))), z*z*z)
+	{	//	even:	 z), z					 					
+		
+		//	< blue:	 Math.sqrt(z)), z	
+		
 		// new Background
 		background = new Group();	
-		double 	fog = 0.5;					
+		double 	fog = 0;					
 		Stop[]	sColors = new Stop[10]; 
 		sColors[0] = new Stop(0.5*fog, sColor);
 		for(int i = 0; i < sColors.length-1; i++)
 		{	double 	z = 1-i/(sColors.length-2.0),
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
-			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, z), z*z*z));			
+			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 			Math.sqrt(z)), z
+					));			
 		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 
 		// mountain 
-		for(double i = 0, layers = 6, j = 1; i < layers; i++, j*=-1)
+		for(double i = 0, layers = 5, j = 1; i < layers; i++, j*=-1)
 		{	
 			// mountain layer							
 			double[] shift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow((i+1)/(layers+1), 2))},
@@ -115,7 +115,8 @@ public class Track
 			double 	z = (1-(i+1)/(layers+1));
 					
 			Color	summit = blend(blend(mColor, Color.BLACK, z*z), sColor, z),
-					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, z), z*z*z);
+					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 						Math.sqrt(z)), z
+							);
 			
 			Stop[] 	colors = 
 			{	new Stop(shift[1]-0.5*(1-fog), summit), 
