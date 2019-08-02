@@ -70,9 +70,22 @@ public class Track
 	
 	// Creates New Track
 	static void newTrack(int tLength)
-	{	//	even:	 z), z					 					
+	{	// BLACK:	z
+			//	WHITE						Fade
+			//	1	 						z, z*z 
+			//	z 							z, z*z , Math.sqrt(z),
+			//	z*z							z, z*z , Math.sqrt(z), 
+			//	Math.sqrt(z)				z, z*z 
+			//	4*Math.pow(z-0.5,3)+0.5		z, z*z
 		
-		//	< blue:	 Math.sqrt(z)), z	
+		
+		// 	BLACK:	z*z
+		//	WHITE:						Fade:
+		//	1	 						z, z*z
+		//	z 							z, z*z 
+		//	z*z							z, z*z , Math.sqrt(z), 4*Math.pow(z-0.5,3)+0.5
+		//	Math.sqrt(z)				z, z*z , Math.sqrt(z), 4*Math.pow(z-0.5,3)+0.5
+		//	4*Math.pow(z-0.5,3)+0.5		z, z*z , Math.sqrt(z), 4*Math.pow(z-0.5,3)+0.5
 		
 		// new Background
 		background = new Group();	
@@ -82,7 +95,7 @@ public class Track
 		for(int i = 0; i < sColors.length-1; i++)
 		{	double 	z = 1-i/(sColors.length-2.0),
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
-			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 			Math.sqrt(z)), z
+			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 		z*z), 4*Math.pow(z-0.5,3)+0.5
 					));			
 		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
@@ -113,11 +126,9 @@ public class Track
 			}	
 
 			double 	z = (1-(i+1)/(layers+1));
-					
 			Color	summit = blend(blend(mColor, Color.BLACK, z*z), sColor, z),
-					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 						Math.sqrt(z)), z
+					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, 					z*z),  4*Math.pow(z-0.5,3)+0.5
 							);
-			
 			Stop[] 	colors = 
 			{	new Stop(shift[1]-0.5*(1-fog), summit), 
 				new Stop(shift[1], base)
@@ -153,16 +164,8 @@ public class Track
 		position[0] += dimension[0];
 		position[1] += dimension[0]*slope;
 		
-		Stop[] 	colors = 
-		{	new Stop(0.78, gColor.darker()), 
-			new Stop(0.82, gColor), 
 			
-			new Stop(0.925, gColor), 
-			new Stop(0.93, gColor.darker()),
-			new Stop(1, gColor.darker().darker()),
-		};
-			
-		p.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
+		p.setFill(mColor);
 		return p;
 	}
 	
