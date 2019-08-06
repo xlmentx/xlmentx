@@ -70,14 +70,7 @@ public class Track
 	
 	// Creates New Track
 	static void newTrack(int tLength)
-	{	// BEST Colors:		summit = blend(blend(mColor, Color.BLACK, z), sColor, z),
-		//					base = blend(blend(mColor, Color.BLACK, z), blend(sColor, fColor, 4*Math.pow(z-0.5,3)+0.5), z*z);
-		// BEST FADE:		summit = blend(blend(mColor, Color.BLACK, z*z), sColor, z),
-		//					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, z), z);
-			
-// Idea: mColor First then Fog(after best, then Compare)		
-		
-		// new Background
+	{	// new Background
 		background = new Group();	
 		double 	fog = 0;					
 		Stop[]	sColors = new Stop[10]; 
@@ -85,7 +78,14 @@ public class Track
 		for(int i = 0; i < sColors.length-1; i++)
 		{	double 	z = 1-i/(sColors.length-2.0),
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
-			sColors[i+1] = new Stop(y, blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, Math.sqrt(z)), z));			
+			sColors[i+1] = new Stop(y, 
+					
+					blend(blend(blend(mColor, Color.BLACK, 									z
+							), sColor , 													z*z	
+							), fColor, 														z
+							)
+									
+					);			
 		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
@@ -113,12 +113,35 @@ public class Track
 				}
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}	
-
+			
+			//	Color	summit = blend(blend(mColor, Color.BLACK, z), sColor, z*z),
+			
+			//	Black 		z
+				//	Sky		z										Fog:	z	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			z*z										Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			1.82-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			
+			//	Black 		z*z
+				//	Sky		z										Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			z*z										Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			1.82-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+		
+			//	Black 		1.82-Math.sqrt(4-Math.pow(z+0.82,2))
+				//	Sky		z										Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			z*z										Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			1.82-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				
 			double 	z = (1-(i+1)/(layers+1));
-			Color	summit = blend(blend(mColor, Color.BLACK, z*z), sColor, z),
-					base = blend(blend(mColor, Color.BLACK, z*z), blend(sColor, fColor, Math.sqrt(z)), z);
+System.out.println("z2:"+z);			
+			Color	summit = blend(blend(mColor, Color.BLACK, 								z
+					), sColor , 															z*z	
+					),
+					base = blend(summit, fColor, 											z
+					)
+					
+					;
 			Stop[] 	colors = 
-			{	new Stop(shift[1]-0.5*(1-fog), summit), 
+			{	new Stop(0.5*fog, summit), 
 				new Stop(shift[1], base)
 			};
 			
@@ -140,6 +163,8 @@ public class Track
 			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope));
 		}
 	}
+	
+	
 	
 	// Create Polygon
 	private static Polygon newPolygon(double[] position, double[] dimension, double slope)
