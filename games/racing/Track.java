@@ -72,7 +72,7 @@ public class Track
 	static void newTrack(int tLength)
 	{	// new Background
 		background = new Group();	
-		double 	fog = 1;					
+		double 	fog = 0.5;					
 		Stop[]	sColors = new Stop[10]; 
 		sColors[0] = new Stop(0.5*fog, sColor);
 		for(int i = 0; i < sColors.length-1; i++)
@@ -80,8 +80,8 @@ public class Track
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
 			sColors[i+1] = new Stop(y, 
 					
-					blend(blend(blend(mColor, Color.BLACK, 									z
-							), sColor , 													z
+					blend(blend(blend(mColor, Color.BLACK, 									z*z
+							), sColor , 													1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 							), fColor, 														z*z
 							)
 									
@@ -116,35 +116,31 @@ public class Track
 			
 			//	Color	summit = blend(blend(mColor, Color.BLACK, z), sColor, z*z),
 			//	Fog != z(too strong)
-			//	Black 		z
-				//	Sky		z										Fog:		z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			z*z										Fog:		z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			1.82-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:		z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			// 	Black <= Sky
+
+			//	Black 		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			z*z										Fog:	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 			
 			//	Black 		z*z
-				//	Sky		z										Fog:	z,	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			z*z										Fog:		z*z		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			1.82-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:		z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			z*z										Fog:	z*z		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			1.826-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 		
-			//	Black 		1.82-Math.sqrt(4-Math.pow(z+0.82,2))
-				//	Sky		z										Fog:		z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			z*z										Fog:		z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			1.82-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:		z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 				
 			double 	z = (1-(i+1)/(layers+1));
-System.out.println("z2:"+z);			
 			Color	summit = blend(blend(mColor, Color.BLACK, 								z*z
-					), sColor , 															z
+					), sColor , 															1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 					),
-					base = blend(summit, fColor, 											z
+					base = blend(summit, fColor, 											z*z
 					)
 					
 					;
+			
+			
 			Stop[] 	colors = 
 			{	new Stop(0.5*fog, summit), 
 				new Stop(shift[1], base)
 			};
-			
+				
 			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
 			background.getChildren().add(mLayer);
 		}
