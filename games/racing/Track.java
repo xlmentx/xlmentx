@@ -82,7 +82,7 @@ public class Track
 					
 					blend(blend(blend(mColor, Color.BLACK, 									z*z
 							), sColor , 													1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-							), fColor, 														z*z
+							), fColor, 														1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 							)
 									
 					);			
@@ -119,18 +119,18 @@ public class Track
 			// 	Black <= Sky
 
 			//	Black 		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			z*z										Fog:	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			z*z										Fog:	z*z,		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 			
 			//	Black 		z*z
-				//			z*z										Fog:	z*z		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				//			1.826-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:	z*z,	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			z*z										Fog:	z*z,		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+				//			1.826-Math.sqrt(4-Math.pow(z+0.82,2))	Fog:	z*z,		1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 		
 				
 			double 	z = (1-(i+1)/(layers+1));
 			Color	summit = blend(blend(mColor, Color.BLACK, 								z*z
 					), sColor , 															1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 					),
-					base = blend(summit, fColor, 											z*z
+					base = blend(summit, fColor, 											1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 					)
 					
 					;
