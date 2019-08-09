@@ -80,9 +80,9 @@ public class Track
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
 			sColors[i+1] = new Stop(y, 
 																				//bRatio
-			blend(blend(mColor, Color.BLACK, 										z*z	
+			blend(blend(mColor, Color.BLACK, 										z*z
 																				//tRatio
-			), blend(sColor, fColor, 												Math.sqrt(z)	
+			), blend(sColor, fColor, 												1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 																				//fRatio
 			), 																		z
 			));			
@@ -114,25 +114,21 @@ public class Track
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}	
 			
-			// 	Black <= Sky
-																									
-			//	B: 	z		T:	z		F:	z	
-			
 			//	B: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))		
-			//		T:	Math.sqrt(z)										F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
+			//		T:	Math.sqrt(z)										F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 			//		T:	-0.826+Math.sqrt(4-Math.pow(z-1.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
 			//		T:	z													F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
 			//		T:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
 				
 			//	B: 	z*z
-			//		T:	Math.sqrt(z)										F:	z		
-			//		T:	-0.826+Math.sqrt(4-Math.pow(z-1.82,2))				F:	z	
-			//		T:	z													F:	z	
-			//		T:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))				F:	z	
+			//		T:	Math.sqrt(z)										F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
+			//		T:	-0.826+Math.sqrt(4-Math.pow(z-1.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			//		T:	z													F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			//		T:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 				
 				
-			double 	z = (1-(i+1)/(layers+1)), 									bRatio = z*z	, 
-																				tRatio = Math.sqrt(z)	, 
+			double 	z = (1-(i+1)/(layers+1)), 									bRatio = z*z, 
+																				tRatio = 1.826-Math.sqrt(4-Math.pow(z+0.82,2)), 
 																				fRatio = z;												
 			
 			Color	summit = blend(blend(mColor, Color.BLACK, bRatio), sColor, fRatio),	
