@@ -72,20 +72,21 @@ public class Track
 	static void newTrack(int tLength)
 	{	// new Background
 		background = new Group();	
-		double 	fog = 0;					
+		double 	fog = 1;					
 		Stop[]	sColors = new Stop[10]; 
 		sColors[0] = new Stop(0.5*fog, sColor);
 		for(int i = 0; i < sColors.length-1; i++)
 		{	double 	z = 1-i/(sColors.length-2.0),
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
 			sColors[i+1] = new Stop(y, 
-																				//bRatio
-			blend(blend(mColor, Color.BLACK, 										z*z
-																				//tRatio
-			), blend(sColor, fColor, 												1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-																				//fRatio
-			), 																		z
-			));			
+																				//black
+			blend(blend(blend(mColor, Color.BLACK, 									z*z*z
+																				//sky
+			), sColor,  															1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+																				//fog
+			), fColor,																1-Math.sqrt(1-Math.pow(z,2))	
+			));	
+			
 		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
@@ -114,25 +115,33 @@ public class Track
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}	
 			
-			//	B: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))		
-			//		T:	Math.sqrt(z)										F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-			//		T:	-0.826+Math.sqrt(4-Math.pow(z-1.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
-			//		T:	z													F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
-			//		T:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
-				
-			//	B: 	z*z
-			//		T:	Math.sqrt(z)										F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	
-			//		T:	-0.826+Math.sqrt(4-Math.pow(z-1.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-			//		T:	z													F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-			//		T:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))				F:	z	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-				
-				
-			double 	z = (1-(i+1)/(layers+1)), 									bRatio = z*z, 
-																				tRatio = 1.826-Math.sqrt(4-Math.pow(z+0.82,2)), 
-																				fRatio = z;												
+			// 	S=F: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
 			
-			Color	summit = blend(blend(mColor, Color.BLACK, bRatio), sColor, fRatio),	
-					base = blend(blend(mColor, Color.BLACK, bRatio), blend(sColor, fColor, tRatio), fRatio);
+			//	S=F:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+						
+			// S Lead: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			//		F:	z*z											B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		F:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		F:	z*z*z										B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		F:	1-Math.sqrt(1-Math.pow(z,2))				B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+							
+			
+			// F Lead: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			//		S:	z*z											B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		S:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+										
+										
+			double 	z = (1-(i+1)/(layers+1)), 									bRatio = z*z*z,
+																				sRatio =	1.826-Math.sqrt(4-Math.pow(z+0.82,2)), 
+																				fRatio = 1-Math.sqrt(1-Math.pow(z,2))			;												
+			
+			Color	mShade = blend(mColor, Color.BLACK, bRatio),
+					summit = blend(mShade, sColor, sRatio),	
+					base = blend(summit, fColor, fRatio);
+System.out.println("z: "+z);			
+System.out.println("mColor: ("+mColor.getRed()+", "+mColor.getGreen()+", "+mColor.getBlue()+")");			
+System.out.println("fColor: ("+fColor.getRed()+", "+fColor.getGreen()+", "+fColor.getBlue()+")");			
+System.out.println("base: ("+base.getRed()+", "+base.getGreen()+", "+base.getBlue()+")\n");			
 			Stop[] 	colors = 
 			{	new Stop(0.5*fog, summit), 
 				new Stop(shift[1], base)
@@ -176,8 +185,7 @@ public class Track
 	}
 	
 	private static Color blend(Color a, Color b, double ratio)
-	{	System.out.println(ratio);
-		return Color.rgb
+	{	return Color.rgb
 		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*ratio)), 
 			(int)(255*(a.getGreen()+(b.getGreen()-a.getGreen())*ratio)), 
 			(int)(255*(a.getBlue()+(b.getBlue()-a.getBlue())*ratio))
