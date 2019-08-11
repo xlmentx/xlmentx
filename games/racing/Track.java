@@ -72,7 +72,7 @@ public class Track
 	static void newTrack(int tLength)
 	{	// new Background
 		background = new Group();	
-		double 	fog = 1;					
+		double 	fog = 0;					
 		Stop[]	sColors = new Stop[10]; 
 		sColors[0] = new Stop(0.5*fog, sColor);
 		for(int i = 0; i < sColors.length-1; i++)
@@ -80,11 +80,11 @@ public class Track
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
 			sColors[i+1] = new Stop(y, 
 																				//black
-			blend(blend(blend(mColor, Color.BLACK, 									z*z*z
+			blend(blend(blend(mColor, Color.BLACK, 									1
 																				//sky
-			), sColor,  															1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			), sColor,  															0
 																				//fog
-			), fColor,																1-Math.sqrt(1-Math.pow(z,2))	
+			), fColor,																z*z				
 			));	
 			
 		}
@@ -92,7 +92,7 @@ public class Track
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
 
 		// mountain 
-		for(double i = 0, layers = 5, j = 1; i < layers; i++, j*=-1)
+		for(double i = 0, layers = 7, j = 1; i < layers; i++, j*=-1)
 		{	
 			// mountain layer							
 			double[] shift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow((i+1)/(layers+1), 2))},
@@ -115,25 +115,20 @@ public class Track
 				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
 			}	
 			
-			// 	S=F: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			// 	S: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
+			//		F:	z*z											B:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		F:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		F:	z*z*z										B:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
 			
-			//	S=F:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
-						
-			// S Lead: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-			//		F:	z*z											B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
-			//		F:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
-			//		F:	z*z*z										B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
-			//		F:	1-Math.sqrt(1-Math.pow(z,2))				B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
-							
-			
-			// F Lead: 	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
-			//		S:	z*z											B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
-			//		S:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))		z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//	S:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))				
+			//		F:	z*z											B:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		F:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))		B:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
+			//		F:	z*z*z										B:	1.826-Math.sqrt(4-Math.pow(z+0.82,2))	z*z		1.367-Math.sqrt(2-Math.pow(z+0.365,2))	z*z*z	1-Math.sqrt(1-Math.pow(z,2))	
 										
 										
-			double 	z = (1-(i+1)/(layers+1)), 									bRatio = z*z*z,
-																				sRatio =	1.826-Math.sqrt(4-Math.pow(z+0.82,2)), 
-																				fRatio = 1-Math.sqrt(1-Math.pow(z,2))			;												
+			double 	z = (1-(i+1)/(layers+1)), 									bRatio = 1,
+																				sRatio = 0, 
+																				fRatio = z*z		;												
 			
 			Color	mShade = blend(mColor, Color.BLACK, bRatio),
 					summit = blend(mShade, sColor, sRatio),	
@@ -180,7 +175,7 @@ System.out.println("base: ("+base.getRed()+", "+base.getGreen()+", "+base.getBlu
 		position[1] += dimension[0]*slope;
 		
 			
-		p.setFill(mColor);
+		p.setFill(Color.BLACK);
 		return p;
 	}
 	
