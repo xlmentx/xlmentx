@@ -1,11 +1,13 @@
 package racing;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -78,19 +80,8 @@ public class Track
 		for(int i = 0; i < sColors.length-1; i++)
 		{	double 	z = 1-i/(sColors.length-2.0),
 					y = 1.75-Math.sqrt(1.56-Math.pow(1-z, 2));
-			sColors[i+1] = new Stop(y, 
-																				//black
-			blend(blend(blend(mColor, Color.BLACK, 									0
-																				//sky
-			), sColor,  															1.367-Math.sqrt(2-Math.pow(z+0.365,2))	
-																				//fog
-			), fColor,																z*z
-			)
-			
-			
-			
-		);	
-			
+			Color	c = blend(blend(mColor, sColor, 1.37-Math.sqrt(2-Math.pow(z+0.36,2))), fColor, z*z);
+			sColors[i+1] = new Stop(y, c);	
 		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
@@ -100,46 +91,39 @@ public class Track
 		{	
 			// mountain layer							
 			double[] shift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow((i+1)/(layers+1), 2))},
-					 position = {Resolution[0]*shift[0],  Resolution[1]*shift[1]},
-					 dimension = {Resolution[0], Resolution[1]/3};
+					 position = {Resolution[0]*shift[0], Resolution[1]*shift[1], 1-(i+1)/(layers+1)},
+					 pDimension = {Resolution[0], Resolution[1]/3};
 			Polygon	 mLayer = new Polygon();	
-			while(position[0]-Resolution[0] <= tLength*Math.pow((i+1)/(layers+1), 3)) 
-			{	double[] 	start = position.clone(),
-							sRange = {0, dimension[1]/(dimension[0]*0.4)},
+			while(position[0]-Resolution[0] <= tLength*Math.pow(1-position[2], 3)) 
+			{	double[] 	pStart = position.clone(),
+							sRange = {0, pDimension[1]/(pDimension[0]*0.4)},
 							sRates = {1, 0, 0, 0.8};
-				while(position[0] <= start[0]+dimension[0]*0.8 && position[1] <= start[1])
+				while(position[0] <= pStart[0]+pDimension[0]*0.8 && position[1] <= pStart[1])
 				{	mLayer.getPoints().addAll(position[0], position[1]);
-					double 	width = random(dimension[0]*0.1),
-			   	   			slope = random(sRange, sRates)*Math.signum(position[0]-start[0]-dimension[0]/2);
-					if(position[0] >= start[0]+dimension[0]*0.4 && slope < 0)
+					double 	width = random(pDimension[0]*0.1),
+				   			slope = random(sRange, sRates)*Math.signum(position[0]-pStart[0]-pDimension[0]/2);
+					if(position[0] >= pStart[0]+pDimension[0]*0.4 && slope < 0)
 					{	slope /= 3; 
 					}
-					position = new double[]{position[0]+width, position[1]+width*slope};
+					position = new double[]{position[0]+width, position[1]+width*slope, position[2]};
 				}
-				mLayer.getPoints().addAll(position[0] = start[0]+dimension[0], position[1] = start[1]);
+				mLayer.getPoints().addAll(position[0] = pStart[0]+pDimension[0], position[1] = pStart[1]);
 			}	
-			//	1.826-Math.sqrt(4-Math.pow(z+0.82,2))
 			
-							
-			//	F: 	z*z		
-			//		S:	1.367-Math.sqrt(2-Math.pow(z+0.365,2))	
-			//		S:	z*z				
-									
-										
-			double 	z = (1-(i+1)/(layers+1)), 									bRatio = 0.1,
-																				sRatio = 1.367-Math.sqrt(2-Math.pow(z+0.365,2));		   										
-
-			Color	shade = blend(mColor, Color.BLACK, bRatio),
-					summit = blend(shade, sColor, sRatio),	
-					base = blend(summit, fColor, z*z),
-					slope = blend(blend(mColor, sColor, sRatio), fColor, z*z);
+			Image mTexture = new Image("image/scenery/MountainRaw.png");
+			mLayer.setFill(blend(mColor, mTexture, 0.5));
 			
-			Stop[] 	colors = 
-			{	new Stop(0.5*fog, summit),
-				new Stop(shift[1], base),
-			};
-				
-			mLayer.setFill(new LinearGradient(0, 0, 0, Resolution[1], false, null, colors));
+			Bounds mBounds = mLayer.getLayoutBounds();
+			//mTexture.setFill(new ImagePattern(mImage, 0, 0, pDimension[0]/mBounds.getWidth(), 1, true));
+			
+			Group mGraphics = new Group();
+			
+			Color	summit = blend(mColor, sColor, 1.367-Math.sqrt(2-Math.pow(position[2]+0.365,2))),	
+					base = blend(summit, fColor, Math.pow(position[2],2));
+			Stop[] 	stops = {new Stop(0.5*fog, summit), new Stop(shift[1], base),};
+			LinearGradient colors = new LinearGradient(0, 0, 0, Resolution[1], false, null, stops);
+			//mLayer.setFill(colors);
+			
 			background.getChildren().add(mLayer);
 		}
 	
@@ -176,6 +160,31 @@ public class Track
 		return p;
 	}
 	
+	// Blend Colors
+	private static Paint blend(Image i, Color c, double ratio)
+	{	PixelReader iReader = i.getPixelReader(); 
+		WritableImage bImage = new WritableImage((int)i.getWidth(), (int)i.getHeight()); 
+		PixelWriter bWriter = bImage.getPixelWriter();           
+		for(int x = 0; x < i.getWidth(); x++) 
+	    {	for(int y = 0; y < i.getHeight(); y++) 
+		    {	bWriter.setColor(x, y, blend(iReader.getColor(x, y), c, ratio));              
+	    	}
+	    }
+		return new ImagePattern(bImage);
+	}
+	private static Paint blend(Color a, Image b, double ratio)
+	{	WritableImage c = new WritableImage((int)b.getWidth(), (int)b.getHeight());
+		PixelWriter cWriter = c.getPixelWriter();
+		PixelReader bReader = b.getPixelReader();
+		for(int y = 0; y < b.getHeight(); y++) 
+		{	for(int x = 0; x < b.getWidth(); x++) 
+			{   Color bColor = bReader.getColor(x, y); 
+	            cWriter.setColor(x, y, blend(a, bColor, ratio));              
+	        }
+	    }	
+		
+		return a;
+	}
 	private static Color blend(Color a, Color b, double ratio)
 	{	return Color.rgb
 		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*ratio)), 
