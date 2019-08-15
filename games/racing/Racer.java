@@ -11,6 +11,7 @@ public class Racer extends Physics
 {	// Racer Images
 	private static 
 	final Image[]		Stand = {new Image("image/character/stand.png")},	
+						tStand = {new Image("image/character/TheoStand.png")},	
 						Run = 	{new Image("image/character/run.png")},		
 						Slide = {new Image("image/character/slide.png")},   
 						WSlide ={new Image("image/character/wallSlide.png")}, 		 
@@ -148,7 +149,8 @@ public class Racer extends Physics
 	
 	// Graphics Update
 	public void translate(double[] cPosition)
-	{	rImage.setTranslateX(cPosition[0]);	
+	{	//rImage.setImage(tStand[type]);
+		rImage.setTranslateX(cPosition[0]);	
 		rImage.setTranslateY(cPosition[1]);
 	}
 	
