@@ -66,7 +66,11 @@ public class Track
 							mColor = Color.WHEAT.darker().saturate(),
 							gColor = Color.WHEAT;
 	
-	
+	private static double	maxHeight = 0,
+							minHeight = Resolution[1],
+							heights = 0,
+							runs = 0; 
+						
 	// Private Constructor
 	private Track(){}
 	
@@ -74,7 +78,7 @@ public class Track
 	static void newTrack(int tLength)
 	{	// Background
 		background = new Group();	
-		double 	fog = 1;					
+		double 	fog = 0;					
 		Stop[]	sColors = new Stop[10]; 
 		sColors[0] = new Stop(0.5*fog, sColor);
 		for(int i = 0; i < sColors.length-1; i++)
@@ -92,45 +96,19 @@ public class Track
 			// Mountain Layer
 			double[] mShift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow((i+1)/(layers+1), 2))},
 					 mPosition = {Resolution[0]*mShift[0], Resolution[1]*mShift[1], 1-(i+1)/(layers+1)},
-					 pDimension = {Resolution[0], Resolution[1]/3};
+					 pDimension = {Resolution[0], Resolution[1]/2};
 			Polygon  mLayer = newMountainLayer(mPosition, pDimension, tLength);	
 
-
-			Image 	mShader = new Image("image/scenery/MountainShader.png"),
-					mFill = blend(mShader, mColor, 0.95); 
-			mFill = blend(mFill, sColor, 1.367-Math.sqrt(2-Math.pow(mPosition[2]+0.365,2)));
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-System.out.println("Fog:");			
-			mFill = blend(mFill, fColor, Math.pow(mPosition[2],2), 0.55, 0.5);
-System.out.println("");			
-			
-			double  peaks = pDimension[0]/mLayer.getLayoutBounds().getWidth();
-			mLayer.setFill(new ImagePattern(mFill, 0, 0, peaks, 1, true));
-			
-			
-						
-			Color	summit = blend(blend(mColor, Color.BLACK, 0.1), sColor, Math.pow(mPosition[2],2)),	
-					base = blend(summit, fColor, Math.pow(mPosition[2],2));
-			Stop[] 	stops = {new Stop(0.5*fog, summit), new Stop(mShift[1], base),};
-			LinearGradient colors = new LinearGradient(0, 0, 0, Resolution[1], false, null, stops);
-			
-			mLayer.setFill(colors);
-			
-			
+			Image mImage = blend(new Image("image/scenery/gTest.png"), mColor, 0.9);
+			mImage = blend(mImage, sColor, Math.pow(mPosition[2],2)); 
+			Bounds 	mBounds = mLayer.getLayoutBounds();
+			double 	fEnd = (fog*Resolution[1]*0.5-mBounds.getMinY())/mBounds.getHeight();
+			mImage = blend(mImage, fColor, Math.pow(mPosition[2],2), 1, fEnd);
+			mLayer.setFill(new ImagePattern(mImage, 0, 0, pDimension[0]/mBounds.getWidth(), 1, true));
 			background.getChildren().add(mLayer);
 		}
-	
+System.out.println("\nMax: "+(int)maxHeight+"	Min: "+(int)minHeight+"	Avg: "+(int)(heights/runs)+"	goal: "+(int)Resolution[1]/2);	
 		// Platforms
 		platforms = new Group();
 		double[] pPosition = {-Resolution[0]/2, Resolution[1]*0.8},
@@ -150,20 +128,43 @@ System.out.println("");
 	private static Polygon newMountainLayer(double[] position, double[] pDimension, int tLength)
 	{	Polygon	 mLayer = new Polygon();	
 		while(position[0] < tLength*Math.pow(1-position[2], 3)+Resolution[0]) 
-		{	double[] 	pStart = position.clone(),
-						sRange = {0, pDimension[1]/pDimension[0]/0.35},
-						sRates = {1, 0, 0, 0.8};
+		{	double[] 	pStart = position.clone();
+			double h = 0;
 			while(position[0] <= pStart[0]+pDimension[0]*0.8 && position[1] <= pStart[1])
 			{	mLayer.getPoints().addAll(position[0], position[1]);
-				double 	width = random(pDimension[0]*0.1),
-						slope = random(sRange, sRates)*Math.signum(position[0]-pStart[0]-pDimension[0]/2);
-				if(position[0] >= pStart[0]+pDimension[0]*0.4 && slope < 0)
-				{	slope /= 3; 
+
+				
+if(pStart[1]-position[1] > h) 
+{	h = pStart[1]-position[1];
+}
+				double[] sRange = {0, pDimension[1]/pDimension[0]/0.3},
+						 sRates = {1, 0, 0.8};
+				double 	 width = random(pDimension[0]*0.1),
+						 slope = random(sRange, sRates),
+						 height = width*slope*Math.signum(position[0]+width/2-pStart[0]-pDimension[0]/2);
+				if(position[0]+width >= pStart[0]+pDimension[0]*0.45 ||
+				   position[1]+height <= pStart[1]-pDimension[1])
+				{	if(height < 0)
+					{	height /= 3;
+System.out.println("hReduced:"+(position[1]+height));					
+					}
 				}
-				position = new double[]{position[0]+width, position[1]+width*slope, position[2]};
+				
+				position = new double[]{position[0]+width, position[1]+height, position[2]};
 			}
+if(h > maxHeight)
+{	maxHeight = h;
+}			
+if(h < minHeight)
+{	minHeight = h;
+}			
+heights += h;
+runs++;
+System.out.println("max: "+(int)h+"	run: "+runs);			
+
 			mLayer.getPoints().addAll(position[0] = pStart[0]+pDimension[0], position[1] = pStart[1]);
 		}	
+System.out.println("\n");			
 		return mLayer;
 	}
 		
@@ -185,73 +186,33 @@ System.out.println("");
 	
 	// Blend Colors
 	private static Image blend(Image i, Color c, double opacity)
-	{	PixelReader iReader = i.getPixelReader(); 
-		WritableImage bImage = new WritableImage((int)i.getWidth(), (int)i.getHeight()); 
-		PixelWriter bWriter = bImage.getPixelWriter();           
-		for(int y = 0; y < i.getHeight(); y++) 
-	    {	for(int x = 0; x < i.getWidth(); x++) 
-	    	{	Color 	iColor = iReader.getColor(x, y),
-	    				bColor = blend(iColor, c, 1-(1-opacity)*iColor.getOpacity());
-	    		bWriter.setColor(x, y, bColor);  
-	    	}
-	    }
-		return bImage;
+	{	return blend(i, c, opacity,  1, 1);
 	}
-	/*
-	(1-y/h)/(e-s)							
-	
-	__		(-1,1)		(0,1)		(0.5, 1)	(1, 1)		(1.5, 1)	(2, 1)		
-	y=0		g = 0.5		g = 0.1		g = 1		g = 1		g = 0		g = 0
-	
-	y=90	g = 0.25	g = 0.5		g = 1		g = 1		g = 0		g = 0
-	__		
-	y=180	g = 0		g = 0		g = 0		g = 1		g = 0		g = 0
-	
-	
-	(1-y/h)/(e-s)							
-	
-	__
-	
-	
-	__		(-1, 0.5)	(0,0.5)		(0.5, 0.5)	(1, 0.5)	(1.5, 0.5)	(2, 0.5)			
-	y=0		g = 0.333	g = 1		g = 0		g = 0		g = 0		g = 0		
-	
-	y=90	g = 0		g = 0		g = 0		g = 0		g = 0		g = 0		
-	__		
-	y=180	g = 0		g = 0		g = 0		g = 1		g = 0.5		g = 0.333		
-	
-		
-	__
-	*/
 	private static Image blend(Image i, Color c, double opacity,  double start, double end)
 	{	PixelReader iReader = i.getPixelReader(); 
 		WritableImage bImage = new WritableImage((int)i.getWidth(), (int)i.getHeight()); 
 		PixelWriter bWriter = bImage.getPixelWriter();           
 		for(int y = 0; y < i.getHeight(); y++) 
-	    {	double gOpacity = (end-y/i.getHeight())/(end-start);
-	    	if(gOpacity < 0)
-	    	{	gOpacity = 0;
+	    {	double gOpacity = (end-y/i.getHeight())/(end-start+0.001);
+	    	if(gOpacity < 0 || gOpacity > 1)
+	    	{	gOpacity = (Math.signum(gOpacity)+1)/2;
 	    	}
-	    	if(gOpacity > 1)
-	    	{	gOpacity = 1;
-	    	}
-if(y == 0 || y == 89 || y == 179)	    	
-{System.out.println("Y:"+y+"	SE: ("+start+", "+end+")	G:"+gOpacity);	    	
-}			
-			for(int x = 0; x < i.getWidth(); x++) 
-	    	{	Color 	iColor = iReader.getColor(x, y),
-	    				bColor = blend(iColor, c, 1-(1-opacity)*iColor.getOpacity());
-	    		bWriter.setColor(x, y, bColor);  
+	    	for(int x = 0; x < i.getWidth(); x++) 
+	    	{	Color 	iColor = iReader.getColor(x, y);
+	    		double  bOpacity = 1-(1-opacity*gOpacity)*iColor.getOpacity();
+	    		Color	bColor = blend(iColor, c, bOpacity);
+	    		bWriter.setColor(x, y, blend(iColor, c, bOpacity));  
 	    	}
 	    }
 		return bImage;
 	}
 	private static Color blend(Color a, Color b, double opacity)
-	{	return Color.rgb
-		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*opacity)), 
-			(int)(255*(a.getGreen()+(b.getGreen()-a.getGreen())*opacity)), 
-			(int)(255*(a.getBlue()+(b.getBlue()-a.getBlue())*opacity))
+	{	Color c = Color.rgb
+		(	(int)(255*(a.getRed()+(b.getRed()-a.getRed())*opacity)+0.5), 
+			(int)(255*(a.getGreen()+(b.getGreen()-a.getGreen())*opacity)+0.5), 
+			(int)(255*(a.getBlue()+(b.getBlue()-a.getBlue())*opacity)+0.5)
 		);
+		return c;
 	}
 	
 	// Random Values
