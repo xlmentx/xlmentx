@@ -130,6 +130,7 @@ System.out.println("dMax: "+(int)(720+720/4-maxHeight)+"	dMin: "+(int)(720-720/4
 				 pDimension = {Resolution[0]*2, Resolution[1]/2};
 		platforms.getChildren().add(newPolygon(pPosition, pDimension, 0));
 		
+		/*
 		while(pPosition[0] < tLength)
 		{	pPosition[0] += random(xRange, pGapRates, 0);
 			pPosition[1] += random(yRange, pDropRates, -random(yRange, pWallRates, 0));
@@ -137,6 +138,7 @@ System.out.println("dMax: "+(int)(720+720/4-maxHeight)+"	dMin: "+(int)(720-720/4
 			double slope = random(sRange, pDeclineRates, -random(sRange, pInclineRates, 0));
 			platforms.getChildren().add(newPolygon(pPosition, pDimension, slope));
 		}
+		*/
 	}
 	
 	// Create mLayer
