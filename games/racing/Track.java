@@ -89,14 +89,14 @@ public class Track
 		}
 		LinearGradient sFill = new LinearGradient(0, 0, 0, 1, true, null, sColors);
 		background.getChildren().add(new Rectangle(Resolution[0], Resolution[1], sFill));
-
+System.out.println("mStart:");
 		// Mountain 
 		for(double i = 0, layers = 5, j = 1; i < layers; i++, j*=-1)
 		{	
 			// Mountain Layer
 			double[] mShift = {(int)(i+1)/2*j/layers-1, 1.75-Math.sqrt(1.56-Math.pow((i+1)/(layers+1), 2))},
 					 mPosition = {Resolution[0]*mShift[0], Resolution[1]*mShift[1], 1-(i+1)/(layers+1)},
-					 pDimension = {Resolution[0], Resolution[1]/2};
+					 pDimension = {Resolution[0], Resolution[1]}; //Resolution[1]/2};
 			Polygon  mLayer = newMountainLayer(mPosition, pDimension, tLength);	
 
 			
@@ -108,7 +108,22 @@ public class Track
 			mLayer.setFill(new ImagePattern(mImage, 0, 0, pDimension[0]/mBounds.getWidth(), 1, true));
 			background.getChildren().add(mLayer);
 		}
-System.out.println("\nMax: "+(int)maxHeight+"	Min: "+(int)minHeight+"	Avg: "+(int)(heights/runs)+"	goal: "+(int)Resolution[1]/2);	
+		
+		// Mountain Test
+		double[]mPosition = {0, Resolution[1], 0},
+				pDimension2 = {Resolution[0], Resolution[1]};
+				Polygon  mLayer = newMountainLayer(mPosition, pDimension2, (int)Resolution[0]);	
+				Image mImage = blend(new Image("image/scenery/gTest.png"), mColor, 0.9);
+				mImage = blend(mImage, sColor, Math.pow(mPosition[2],2)); 
+				Bounds 	mBounds = mLayer.getLayoutBounds();
+				double 	fEnd = (fog*Resolution[1]*0.5-mBounds.getMinY())/mBounds.getHeight();
+				mImage = blend(mImage, fColor, Math.pow(mPosition[2],2), 1, fEnd);
+				mLayer.setFill(new ImagePattern(mImage, 0, 0, pDimension2[0]/mBounds.getWidth(), 1, true));
+				background.getChildren().add(mLayer);
+System.out.println("Max:  "+(int)maxHeight+"	Min:  "+(int)minHeight+"	Avg:  "+(int)(heights/runs));	
+System.out.println("goal: "+(int)(720+720/4)+"	goal: "+(int)(720-720/4)+"	goal: "+720);	
+System.out.println("dMax: "+(int)(720+720/4-maxHeight)+"	dMin: "+(int)(720-720/4-minHeight)+"	dAvg: "+(int)(720-heights/runs));	
+		
 		// Platforms
 		platforms = new Group();
 		double[] pPosition = {-Resolution[0]/2, Resolution[1]*0.8},
@@ -125,9 +140,9 @@ System.out.println("\nMax: "+(int)maxHeight+"	Min: "+(int)minHeight+"	Avg: "+(in
 	}
 	
 	// Create mLayer
-	private static Polygon newMountainLayer(double[] position, double[] pDimension, int tLength)
+	private static Polygon newMountainLayer(double[] position, double[] pDimension, int length)
 	{	Polygon	 mLayer = new Polygon();	
-		while(position[0] < tLength*Math.pow(1-position[2], 3)+Resolution[0]) 
+		while(position[0] < length*Math.pow(1-position[2], 3)+Resolution[0]) 
 		{	double[] 	pStart = position.clone();
 			double h = 0;
 			while(position[0] <= pStart[0]+pDimension[0]*0.8 && position[1] <= pStart[1])
@@ -136,22 +151,23 @@ System.out.println("\nMax: "+(int)maxHeight+"	Min: "+(int)minHeight+"	Avg: "+(in
 				
 if(pStart[1]-position[1] > h) 
 {	h = pStart[1]-position[1];
-}
-				double[] sRange = {0, pDimension[1]/pDimension[0]/0.3},
-						 sRates = {1, 0, 0.8};
-				double 	 width = random(pDimension[0]*0.1),
-						 slope = random(sRange, sRates),
-						 height = width*slope*Math.signum(position[0]+width/2-pStart[0]-pDimension[0]/2);
-				if(position[0]+width >= pStart[0]+pDimension[0]*0.45 ||
-				   position[1]+height <= pStart[1]-pDimension[1])
-				{	if(height < 0)
-					{	height /= 3;
-System.out.println("hReduced:"+(position[1]+height));					
-					}
+
+}			
+				double[]sRange = {0, pDimension[1]/pDimension[0]/0.41},
+						sRates = {0, 0, 0, 0.8};
+				double	width = random(pDimension[0]*0.1);
+				if(position[0]+pDimension[0]*0.09 >= pStart[0]+pDimension[0]/2 && position[0] <= pStart[0]+pDimension[0]/2)
+				{	//width = pDimension[0]*0.1;
+					//sRates = new double[]{1,0,0,0};
 				}
+System.out.println("Slope:");				
+				double	slope = random(sRange, sRates),//{pDimension[1]/pDimension[0]/0.57, pDimension[1]/pDimension[0]/0.41},
+						height = width*slope*Math.signum(position[0]+width/2-pStart[0]-pDimension[0]/2);
+System.out.println("");				
 				
 				position = new double[]{position[0]+width, position[1]+height, position[2]};
 			}
+
 if(h > maxHeight)
 {	maxHeight = h;
 }			
@@ -160,11 +176,8 @@ if(h < minHeight)
 }			
 heights += h;
 runs++;
-System.out.println("max: "+(int)h+"	run: "+runs);			
-
 			mLayer.getPoints().addAll(position[0] = pStart[0]+pDimension[0], position[1] = pStart[1]);
 		}	
-System.out.println("\n");			
 		return mLayer;
 	}
 		
@@ -222,17 +235,23 @@ System.out.println("\n");
 	private static double random(double[] range, double[] rates)
 	{	return random(range, rates, range[0]);
 	}
-	private static double random(double[] range, double[] rates, double defaultValue)
-	{	double 	randomValue = defaultValue,
-				rangeSegments = (range[1]-range[0])/rates.length;
+	private static double random(double[] range, double[] rates, double dValue)
+	{	double 	rValue = dValue,
+				segment = (range[1]-range[0])/rates.length;
 		Random r = new Random();
 		for(int i = 0; i < rates.length; i++)
-		{	if(r.nextDouble() <= rates[i])
-			{	double randomSegment = r.nextInt((int)(rangeSegments*100))/100.00; 
-				randomValue = range[0]+rangeSegments*i+randomSegment;
+		{	double chance = r.nextDouble();
+System.out.println("	c:"+chance+"	r:"+rates[i]);		
+		
+			if(chance <= rates[i])
+			{	double randomSegment = r.nextInt((int)(segment*100))/100.00; 
+				rValue = range[0]+segment*i+randomSegment;
+System.out.println("	next:");		
+				
 			}
 		}
-		return randomValue;
+System.out.println("   rV:"+rValue+"	d:"+dValue+"	s:"+segment);		
+		return rValue;
 	}	
 	
 	// Track Update
