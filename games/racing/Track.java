@@ -155,23 +155,23 @@ if(pStart[1]-position[1] > h)
 
 //Work on Cap first then uphills
 				double[] sRange = {0, pDimension[1]/pDimension[0]/0.37},
-						 sRates = {0, 1, 0, 0, 0.7};
-				if(position[0] > pStart[0]+pDimension[0]*0.4 && position[0] < pStart[0]+pDimension[0]*0.5)
+						 sRates = {0, 1, 0, 0, 1},
+						 wRange = {0, pDimension[0]*0.1};
+				double  width = random(wRange);
+		
+				if(position[0]+sRange[1] > pStart[0]+pDimension[0]*0.4 && position[0] < pStart[0]+pDimension[0]*0.5)
 				{	sRates = new double[] {1, 0, 0};
+					width = pDimension[0]*0.1;
 				}
-				double slope = random(sRange, sRates);
 				
-				
-				double[] wRange = {pDimension[0]*0.01, pDimension[0]*0.1};
+				double  slope = random(sRange, sRates);
+		
 				if(position[0] < pStart[0]+pDimension[0]*0.4 || position[0] > pStart[0]+pDimension[0]*0.55)
 				{	if(slope < sRange[1]/2)
-					{	wRange = new double[]{pDimension[0]*0.01, pDimension[0]*0.05};
+					{	//wRange = new double[]{pDimension[0]*0.01, pDimension[0]*0.05};
 					}	
 				}
-				
-				double width = random(wRange);
-
-				
+								
 				
 				double height = width*slope*Math.signum(position[0]+width/2-pStart[0]-pDimension[0]/2);
 				
