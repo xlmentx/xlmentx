@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="author" content="Iain Ro">
+        <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="../style.css">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' translate.google.com https://translate.googleapis.com;" />
+        <title>Landing Page</title> 
+    </head>
+    <style>
+        
+        #fun-facts {
+            text-align: center;
+            margin-top: 80px;
+            max-width: 320px;
+            height: 80px;
+        }
+        @media only screen and (max-height: 250px) {
+            .ob-page-title{
+                visibility: hidden;
+            }
+        }
+    </style>
+    
+    <body id="landing" class="orange">
+        <header class="logo">wepomo
+            <div id="google_translate_element" class="task-right"></div>
+        </header>
+    
+        <main>
+            <p class="p-body">Good luck on your work today!</p>
+            <button id="to-set-up" class="ob-button">Start</button>
+            <button id="to-how-to" class="ob-button">How To</button>
+            <div id="fun-facts">Fun Fact: Pomodoro is Tomato in Italian!</div>
+            <a id="download-wepomo" href="" style="color: #fff; position: fixed; transform: translateY(170px);" download>download wepomo</a>
+        </main>
+        <script>let exports = {};</script>
+        <script src="../JS/landing-page.js"></script>
+
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
+            }
+        </script>
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    </body>
+</html> 
