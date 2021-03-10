@@ -1,0 +1,525 @@
+/* Consistent Titles */
+header {
+  font-size: 40px;
+  font-weight: bold;
+  color: rgb(242, 71, 38, 0.9);
+  padding: 60px 10%;
+  display: inline-block;
+  width: 85%;
+}
+
+.logo {
+  color: white;
+  font-size: 60px;
+}
+
+header > a {
+  float: right;
+}
+
+/* Consistent Buttons */
+button {
+  height: 45px;
+  width: 150px;
+  margin: 10px 50px;
+  color: white;
+  background-color: rgb(242, 71, 38, 0.9);
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.ob-button {
+  background-color: rgb(255, 255, 255, 80%);
+  color: #f24726;
+  width: 375px;
+  height: 50px;
+}
+
+button:hover {
+  background-color: rgba(242, 71, 38, 0.7);
+  outline: none;
+  cursor: pointer;
+}
+
+.ob-button:hover {
+  background-color: rgba(235, 235, 235, 0.8);
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* Consistent Tables */
+.wb-table {
+  border-collapse: collapse;
+  width: 60%;
+  height: 200px;
+  margin-left: 200px;
+}
+
+.wb-table th {
+  background-color: #e6e6e6;
+}
+
+.wb-table tr {
+  color: rgba(242, 71, 38, 0.8);
+  border: 1px solid #e6e6e6;
+}
+
+.wb-table tr:nth-child(odd) {
+  background-color: #e6e6e6;
+}
+
+.wb-table td {
+  padding: 15px;
+}
+
+/* END OF ALL PAGE PIECES */
+body {
+  font-family: 'Oswald', sans-serif;
+}
+
+.orange {
+  background-color: rgb(242, 71, 38, 80%);
+  color: white;
+}
+
+main {
+  width: 100%;
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.results-container {
+  width: 75%;
+  margin: auto;
+  padding: 30px;
+  display: block;
+}
+
+.set-up-page {
+  text-align: center;
+  padding-bottom: 100px;
+}
+
+.break-page {
+  display: none;
+}
+
+.section-page {
+  display: none;
+}
+
+.p-body {
+  color: #fff;
+  font-size: 20px;
+}
+
+audio {
+  visibility: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Open Sans', sans-serif;
+  color: #fff;
+  text-align: center;
+  display: block;
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(226, 226, 226, 0.8);
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(226, 226, 226, 0.8);
+}
+
+/* end of custom scrollbar */
+
+/* results-page css starts here */
+
+.table-header {
+  font-family: 'Open Sans', sans-serif;
+  color: #fff;
+  font-size: 24px;
+  display: block;
+  font-style: normal;
+  margin-block-end: 0;
+  text-align: center;
+}
+
+.two-col-grid-container {
+  display: grid;
+  grid-template-columns: 2fr 2fr;
+  grid-template-rows: auto max-content;
+  padding-left: 8%;
+  padding-right: 8%;
+  column-gap: 30px;
+  max-height: 60vh;
+}
+
+#complete-items {
+  margin-block-start: 0.5em;
+  padding-inline-start: 0;
+  overflow: auto;
+  max-height: 50vh;
+  list-style-position: inside;
+}
+
+#uncomplete-items {
+  margin-block-start: 0.5em;
+  padding-inline-start: 0;
+  overflow: auto;
+  max-height: 50vh;
+  list-style-position: inside;
+}
+
+.li-task {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-family: 'Open Sans', sans-serif;
+  color: #fff;
+  font-size: 20px;
+  font-style: normal;
+}
+
+.div-flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding-left: 50px;
+  padding-right: 50px;
+  margin: 25px;
+}
+
+.task-comp {
+  border-radius: 5px;
+  border: 2px rgba(235, 235, 235, 0.8);
+  background-color: rgba(245, 245, 245, 0.8);
+  width: 70%;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 15px;
+}
+
+.task-main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.task-name {
+  font-family: 'Open Sans', sans-serif;
+  color: black;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  padding-left: 10px;
+}
+
+.actual-pomo {
+  font-family: 'Open Sans', sans-serif;
+  color: black;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.expected-pomo {
+  font-family: 'Open Sans', sans-serif;
+  color: black;
+  font-size: 15px;
+  font-style: normal;
+}
+
+.task-progress-bar {
+  margin: auto;
+  width: 50%;
+  height: 3.5em;
+  background-color: rgba(242, 71, 38, 0.5);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: #da1515;
+  border-radius: 3px;
+  transition:
+    width 2s ease-in-out,
+    background-color 5s ease;
+}
+
+#prog-num {
+  font-family: 'Open Sans', sans-serif;
+  color: #fff;
+  font-size: 20px;
+  font-style: normal;
+  text-align: center;
+  margin: auto;
+  width: 100%;
+}
+
+/* results-page css ends here */
+
+/* style for pomo-page.html starts here */
+.task {
+  height: 50px;
+  width: 350px;
+  border-radius: 10px;
+  font-size: larger;
+  border: 2px solid;
+  color: #1a1a1a;
+  background-color: #e6e6e6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timer-container,
+.timer,
+.progress-bar {
+  width: 600px;
+  height: 60px;
+  border-radius: 10px;
+  font-size: 50px;
+}
+
+.timer-container {
+  display: flex;
+  align-items: center;
+  border: 2px solid;
+  margin-bottom: 10px;
+}
+
+.timer {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-bar {
+  position: absolute;
+  background-color: rgba(242, 71, 38, 0.5);
+}
+
+/* style for break-page html */
+
+.break-timer-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2%;
+  margin-bottom: 5%;
+}
+
+/* style for break-page ends here */
+
+/* set-up page starts here */
+
+hr {
+  border: 1px solid rgb(255, 81, 0);
+  width: 50%;
+  margin: 5% 25%;
+}
+
+.orange-hr {
+  margin-top: 3%;
+}
+
+.flex-container {
+  margin: 0 20%;
+  width: 59.15vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-container > div {
+  display: inline-block;
+  border: solid;
+  border-color: lightgrey;
+  border-width: 0 0 2px 0;
+}
+
+.task-title {
+  background-color: lightgrey;
+}
+
+.task-entry * {
+  background-color: transparent;
+}
+
+.task-left {
+  float: left;
+  margin-top: 8px;
+  margin-left: 20px;
+  text-align: left;
+  height: 30px;
+  width: 70%;
+  border: none;
+  color: rgb(255, 81, 0);
+  font-size: 20px;
+}
+
+.task-right {
+  float: right;
+  margin-top: 3px;
+  padding-right: 10px;
+  text-align: center;
+  height: 30px;
+  border: none;
+  color: rgb(255, 81, 0);
+  font-size: 20px;
+}
+
+.task-title > .task-right {
+  margin-top: 8px;
+}
+
+.task-right > input {
+  height: 25px;
+  width: 43px;
+  border: none;
+  outline: none;
+  text-align: right;
+  padding-right: 3px;
+  caret-color: transparent;
+}
+
+::placeholder {
+  color: rgb(255, 81, 0);
+}
+
+.to-how-to-page {
+  position: absolute;
+  right: 21%;
+  width: 25px;
+  height: 25px;
+  border: none;
+  border-radius: 50%;
+  outline: none;
+  font-weight: bold;
+  font-size: smaller;
+  transition: all 0.15s ease-in;
+}
+
+@media only screen and (max-width: 1000px) {
+  .task-title > .task-left {
+    width: 50%;
+  }
+}
+
+/* how-to-page starts here */
+.how-to-body {
+  width: 100vw;
+}
+
+.tip-div {
+  background-color: rgb(255, 119, 45, 0.6);
+  color: black;
+  padding: 7px 0;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 40px;
+  margin-left: 30px;
+  margin-right: 30px;
+  height: 95px;
+}
+
+.instructions-list {
+  padding-left: 0;
+  text-align: left;
+}
+
+.instructions-list li {
+  padding: 3px;
+  font-size: 20px;
+}
+
+#buttonwrapper {
+  width: 100%;
+  height: 95px;
+  border: none;
+  display: flex;
+  padding: 15px 0;
+  align-items: center;
+  justify-content: center;
+}
+
+#listwrapper {
+  width: 100%;
+  border: none;
+  display: flex;
+  margin-bottom: 40px;
+  justify-content: center;
+}
+
+.wb-button.setup {
+  margin-left: 150px;
+}
+
+@media only screen and (min-width: 1200px) {
+  .howtoTitle {
+    left: 20%;
+  }
+}
+
+@media only screen and (min-width: 1600px) {
+  .howtoTitle {
+    left: 25%;
+  }
+}
+
+@media only screen and (min-width: 1800px) {
+  .howtoTitle {
+    left: 30%;
+  }
+}
+
+.howtoTitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: 40px;
+  font-weight: bold;
+  color: rgb(242, 71, 38, 0.9);
+  display: inline-block;
+  width: 30%;
+}
+
+.browser-reqs {
+  text-align: center;
+  margin-left: 30px;
+  margin-right: 30px;
+  color: rgb(242, 71, 38, 0.9);
+}
