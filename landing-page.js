@@ -6,7 +6,7 @@ setInterval(funFacts, 5000);
 });
 
 function toHowTo(){
-    window.location.href = "./how-to-page.html";
+    window.location.href = "./tests.html";
 }
 
 function toSetUp(){
